@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESG Prompt Library · Biblioteca de Prompts ESG</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f0d;
+    --bg2: #111a15;
+    --bg3: #162019;
+    --surface: #1a2b1f;
+    --surface2: #1f3325;
+    --border: #2a4030;
+    --border2: #3a5545;
+    --accent: #4ade80;
+    --accent2: #86efac;
+    --accent3: #bbf7d0;
+    --gold: #fbbf24;
+    --blue: #60a5fa;
+    --rose: #f87171;
+    --text: #e8f5ed;
+    --text2: #a3c4ad;
+    --text3: #6b9b7a;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --serif: 'Playfair Display', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 80px 40px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .header-title {
+    font-family: var(--serif);
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .header-title span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .header-subtitle {
+    font-family: var(--serif);
+    font-size: clamp(16px, 2.5vw, 22px);
+    color: var(--text3);
+    font-style: italic;
+    margin-bottom: 32px;
+  }
+
+  .header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .header-covers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .covers-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  .cover-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    background: var(--surface);
+    text-transform: uppercase;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 5px 12px;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    text-transform: uppercase;
+    background: var(--surface);
+  }
+
+  .badge.active { border-color: var(--accent); color: var(--accent); background: rgba(74,222,128,0.06); }
+  .badge.gold { border-color: var(--gold); color: var(--gold); background: rgba(251,191,36,0.06); }
+  .badge.blue { border-color: var(--blue); color: var(--blue); background: rgba(96,165,250,0.06); }
+
+  /* CONTROLS */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,15,13,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+  }
+
+  .controls-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    width: 16px;
+    height: 16px;
+  }
+
+  #searchInput {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 14px 10px 40px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #searchInput:focus { border-color: var(--accent); }
+  #searchInput::placeholder { color: var(--text3); }
+
+  .filter-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: var(--border2); color: var(--text2); }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(74,222,128,0.08); }
+
+  .lang-toggle {
+    display: flex;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .lang-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .lang-btn.active { background: var(--accent); color: var(--bg); }
+
+  /* STATS BAR */
+  .stats-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-number {
+    font-family: var(--mono);
+    font-size: 24px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+
+  /* MAIN CONTENT */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--text3);
+    line-height: 1.6;
+    max-width: 600px;
+    margin-bottom: 24px;
+  }
+
+  /* PROMPT GRID */
+  .prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2px;
+  }
+
+  /* PROMPT CARD */
+  .prompt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    position: relative;
+    transition: all 0.25s;
+    cursor: default;
+    overflow: hidden;
+  }
+
+  .prompt-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .prompt-card:hover {
+    background: var(--surface2);
+    border-color: var(--border2);
+    transform: translateY(-1px);
+  }
+
+  .prompt-card:hover::before { opacity: 1; }
+
+  .prompt-card.hidden { display: none; }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .tag-vsme { background: rgba(251,191,36,0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.25); }
+  .tag-csrd { background: rgba(96,165,250,0.1); color: var(--blue); border: 1px solid rgba(96,165,250,0.25); }
+  .tag-gri { background: rgba(74,222,128,0.1); color: var(--accent); border: 1px solid rgba(74,222,128,0.25); }
+  .tag-iso { background: rgba(248,113,113,0.1); color: var(--rose); border: 1px solid rgba(248,113,113,0.25); }
+  .tag-general { background: rgba(167,139,250,0.1); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.25); }
+
+  .difficulty {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .diff-basic { color: var(--text3); border: 1px solid var(--border); }
+  .diff-advanced { color: var(--gold); border: 1px solid rgba(251,191,36,0.3); background: rgba(251,191,36,0.05); }
+  .diff-expert { color: var(--rose); border: 1px solid rgba(248,113,113,0.3); background: rgba(248,113,113,0.05); }
+
+  .card-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .card-title-en {
+    font-family: var(--serif);
+    font-size: 13px;
+    color: var(--text3);
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  .card-use {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .prompt-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .prompt-box-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .prompt-text {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--accent3);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .prompt-text.en { color: var(--blue); }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 7px 14px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(74,222,128,0.05); }
+  .copy-btn.copied { border-color: var(--accent); color: var(--accent); background: rgba(74,222,128,0.1); }
+
+  /* EMPTY STATE */
+  #emptyState {
+    display: none;
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-name {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+
+  .footer-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .footer-links a {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--accent2); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    header, main, .stats-bar { padding-left: 20px; padding-right: 20px; }
+    .controls { padding-left: 20px; padding-right: 20px; }
+    .controls-inner { flex-direction: column; align-items: stretch; }
+    .prompt-grid { grid-template-columns: 1fr; }
+    header { padding-top: 48px; }
+    footer { padding: 40px 20px; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt-card {
+    animation: fadeInUp 0.4s ease both;
+  }
+
+  .section:nth-child(1) .prompt-card { animation-delay: calc(var(--i, 0) * 0.04s); }
+  .section:nth-child(2) .prompt-card { animation-delay: calc(0.1s + var(--i, 0) * 0.04s); }
+  .section:nth-child(3) .prompt-card { animation-delay: calc(0.2s + var(--i, 0) * 0.04s); }
+  .section:nth-child(4) .prompt-card { animation-delay: calc(0.3s + var(--i, 0) * 0.04s); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">ESG Prompt Library · v1.0 · 2026</div>
+  <h1 class="header-title">Biblioteca de<br><span>Prompts ESG</span></h1>
+  <p class="header-subtitle">ESG Prompt Library for European Sustainability Reporting</p>
+  <div class="header-covers">
+    <span class="covers-label">Temas · Topics:</span>
+    <span class="cover-pill">CSRD / ESRS</span>
+    <span class="cover-pill">VSME / EFRAG</span>
+    <span class="cover-pill">GRI Standards</span>
+    <span class="cover-pill">ISO 14001</span>
+    <span class="cover-pill">GHG Protocol</span>
+    <span class="cover-pill">Green Claims Directive</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar prompts / Search prompts..." autocomplete="off">
+    </div>
+    <div class="filter-group" id="filterGroup">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="vsme">VSME</button>
+      <button class="filter-btn" data-filter="csrd">CSRD</button>
+      <button class="filter-btn" data-filter="gri">GRI</button>
+      <button class="filter-btn" data-filter="iso">ISO</button>
+      <button class="filter-btn" data-filter="general">General</button>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="both">ES+EN</button>
+    </div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-number" id="totalCount">42</span><span class="stat-label">Prompts</span></div>
+  <div class="stat"><span class="stat-number">5</span><span class="stat-label">Estándares</span></div>
+  <div class="stat"><span class="stat-number">9</span><span class="stat-label">Categorías</span></div>
+  <div class="stat"><span class="stat-number" id="visibleCount">42</span><span class="stat-label">Visibles</span></div>
+</div>
+
+<main id="mainContent">
+
+  <!-- SECCIÓN 1: ANÁLISIS DE BRECHAS / GAP ANALYSIS -->
+  <div class="section" id="sec-gap">
+    <div class="section-header">
+      <h2 class="section-title">Análisis de Brechas · Gap Analysis</h2>
+      <span class="section-count">Data Analytics</span>
+    </div>
+    <p class="section-desc">Prompts para identificar métricas faltantes, datapoints no reportados y brechas de cumplimiento normativo frente a VSME, CSRD/ESRS y GRI.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="vsme" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Diagnóstico de Brechas VSME</div>
+        <div class="card-title-en">VSME Gap Diagnostic</div>
+        <div class="card-use">Evalúa qué datapoints obligatorios del Módulo B (básico) del estándar VSME/EFRAG aún no están cubiertos por la empresa.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como un auditor ESG especializado en el estándar VSME de EFRAG para PYMEs europeas. Analiza la siguiente descripción de actividades de sostenibilidad de la empresa: [DESCRIPCIÓN]. 
+
+Para cada uno de los 4 módulos del Módulo B (Medio Ambiente, Social, Gobernanza, Estrategia), identifica:
+1. Datapoints que ya están cubiertos (con evidencia del texto)
+2. Datapoints obligatorios que faltan
+3. Nivel de prioridad para completar cada brecha (Alta/Media/Baja)
+
+Presenta el resultado como una tabla de diagnóstico con columnas: Módulo | Datapoint VSME | Estado | Prioridad | Acción recomendada.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESG auditor specializing in the EFRAG VSME standard for European SMEs. Analyze the following description of the company's sustainability activities: [DESCRIPTION].
+
+For each of the 4 Module B sections (Environment, Social, Governance, Strategy), identify:
+1. Datapoints already covered (with textual evidence)
+2. Mandatory missing datapoints
+3. Priority level to address each gap (High/Medium/Low)
+
+Present results as a diagnostic table: Module | VSME Datapoint | Status | Priority | Recommended Action.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">CSRD</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Brecha ESRS por Tema de Sostenibilidad</div>
+        <div class="card-title-en">ESRS Gap by Sustainability Topic</div>
+        <div class="card-use">Identifica qué requisitos de divulgación de un estándar ESRS específico (p.ej. E1 Cambio Climático) no están cubiertos en el borrador del informe.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como un experto en CSRD y ESRS (European Sustainability Reporting Standards). Tienes delante el borrador de la sección de sostenibilidad de nuestra empresa: [TEXTO DEL BORRADOR].
+
+Compara este contenido con los requisitos obligatorios de divulgación del estándar [ESRS EX / SX / GX]. Para cada requisito:
+- Indica si está cubierto (✓), parcialmente cubierto (◐) o ausente (✗)
+- Si está ausente o parcial, explica qué información concreta falta
+- Señala si el datapoint es obligatorio para todas las empresas o condicional (sujeto a materialidad)
+
+Salida: tabla con columnas Requisito ESRS | Párrafo | Cobertura | Información faltante | Obligatoriedad.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a CSRD and ESRS expert. Review the following draft sustainability section: [DRAFT TEXT].
+
+Compare this content against the mandatory disclosure requirements of [ESRS Ex / Sx / Gx]. For each requirement:
+- Flag as covered (✓), partially covered (◐) or missing (✗)
+- If missing or partial, specify exactly what information is lacking
+- Note whether the datapoint is mandatory for all entities or conditional (subject to materiality)
+
+Output: table with columns ESRS Requirement | Paragraph | Coverage | Missing Information | Mandatory Status.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="gri" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-gri">GRI</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Alineación con Estándares GRI</div>
+        <div class="card-title-en">GRI Standards Alignment Check</div>
+        <div class="card-use">Verifica la cobertura de los requisitos de divulgación GRI Universal Standards y los GRI Tópicos Materiales relevantes para el sector.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como un experto en GRI Standards (versión 2021). Revisa el siguiente texto de nuestro informe de sostenibilidad: [TEXTO].
+
+Empresa: [NOMBRE] | Sector: [SECTOR] | Temas materiales declarados: [LISTA]
+
+Evalúa la cobertura de:
+1. GRI 2 (Divulgaciones generales): indica qué divulgaciones 2-1 a 2-30 están presentes
+2. GRI 3 (Temas materiales): verifica si el proceso de determinación de materialidad está documentado
+3. Para cada tema material declarado: indica qué GRI Tópico corresponde y qué divulgaciones específicas faltan
+
+Prioriza las brechas críticas para una auditoría de tercera parte.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a GRI Standards expert (2021 version). Review the following sustainability report text: [TEXT].
+
+Company: [NAME] | Sector: [SECTOR] | Declared material topics: [LIST]
+
+Evaluate coverage of:
+1. GRI 2 (General Disclosures): identify which disclosures 2-1 through 2-30 are present
+2. GRI 3 (Material Topics): verify if the materiality determination process is documented
+3. For each declared material topic: identify the corresponding GRI Topic standard and list missing disclosures
+
+Prioritize critical gaps for third-party assurance.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: VERIFICACIÓN DE DATOS / DATA VERIFICATION -->
+  <div class="section" id="sec-data">
+    <div class="section-header">
+      <h2 class="section-title">Verificación de Datos · Data Verification</h2>
+      <span class="section-count">Data Analytics</span>
+    </div>
+    <p class="section-desc">Prompts para detectar anomalías, verificar cálculos y asegurar la integridad aritmética de tablas de emisiones, consumos y métricas ESG.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="general csrd gri" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">General</span><span class="tag tag-csrd">CSRD</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Verificación Aritmética de Emisiones</div>
+        <div class="card-title-en">Emissions Arithmetic Check</div>
+        <div class="card-use">Comprueba que los subtotales de Scope 1, 2 y 3 sumen correctamente al total de GEI declarado, e identifica errores de cálculo.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como un auditor de datos de sostenibilidad. Revisa las siguientes tablas de emisiones de GEI de nuestro borrador de informe: [PEGAR TABLAS].
+
+Verifica:
+1. Que Scope 1 + Scope 2 (market-based) + Scope 3 = Total GEI declarado
+2. Que cada categoría de Scope 3 sume correctamente a su subtotal
+3. Que las unidades sean consistentes (tCO2e) en toda la tabla
+4. Que los datos del año anterior sean consistentes con el informe previo: [DATOS AÑO ANTERIOR]
+
+Para cada error encontrado, señala: ubicación exacta en la tabla | valor incorrecto | valor esperado | tipo de error.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a sustainability data auditor. Review the following GHG emissions tables from our draft report: [PASTE TABLES].
+
+Verify:
+1. Scope 1 + Scope 2 (market-based) + Scope 3 = Declared Total GHG
+2. Each Scope 3 category correctly sums to its subtotal
+3. Units are consistent (tCO2e) throughout the table
+4. Prior year data is consistent with the previous report: [PRIOR YEAR DATA]
+
+For each error found, specify: exact location | incorrect value | expected value | error type.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso general" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14064</span><span class="tag tag-general">Huella CO₂</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Auditoría de Factores de Emisión</div>
+        <div class="card-title-en">Emission Factors Audit</div>
+        <div class="card-use">Verifica que los factores de emisión utilizados en el cálculo de la huella de carbono sean actuales, de fuentes reconocidas y apropiados para la geografía.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como un experto en cálculo de huella de carbono según ISO 14064-1 y el Protocolo GHG. Revisa los siguientes factores de emisión utilizados en nuestro inventario: [TABLA DE FACTORES].
+
+Para cada factor, verifica:
+1. ¿La fuente citada es reconocida? (IPCC, DEFRA, MITECO, IEA, ECOINVENT, etc.)
+2. ¿El factor es el más actualizado disponible para [AÑO DE REPORTE]?
+3. ¿Es geográficamente apropiado para [PAÍS/REGIÓN]?
+4. ¿La unidad es correcta para la categoría de emisión?
+
+Señala cualquier factor desactualizado (>3 años) o de fuente no reconocida, y sugiere alternativas.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a carbon footprint expert per ISO 14064-1 and GHG Protocol. Review the following emission factors used in our inventory: [FACTORS TABLE].
+
+For each factor, verify:
+1. Is the cited source recognized? (IPCC, DEFRA, MITECO, IEA, ECOINVENT, etc.)
+2. Is the factor the most recent available for [REPORTING YEAR]?
+3. Is it geographically appropriate for [COUNTRY/REGION]?
+4. Is the unit correct for the emission category?
+
+Flag any outdated (>3 years) or unrecognized-source factors, and suggest alternatives.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general csrd" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">General</span></div>
+          <span class="difficulty diff-basic">Básico</span>
+        </div>
+        <div class="card-title">Cruce de Datos Tabla–Fuente</div>
+        <div class="card-title-en">Table-to-Source Cross-Reference</div>
+        <div class="card-use">Compara cada dato de una tabla del borrador contra la hoja de cálculo fuente y marca inconsistencias. Basado en la técnica del AI Playbook de Google.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">He pegado el texto de nuestra tabla de datos borrador a continuación y adjunto la hoja de cálculo fuente. Crea una tabla comparativa con cada punto de dato:
+
+Columna 1: Dato en la tabla borrador
+Columna 2: Valor en la hoja fuente
+Columna 3: Marca cualquier inconsistencia con 🔴
+
+TABLA BORRADOR: [PEGAR TABLA]
+HOJA FUENTE: [PEGAR DATOS]
+
+Finaliza con un resumen del número de inconsistencias encontradas y las más críticas.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">I've pasted the text from our draft data table below and the source spreadsheet data. Create a comparison table for every data point:
+
+Column 1: Draft table value
+Column 2: Source spreadsheet value
+Column 3: Flag any inconsistencies with 🔴
+
+DRAFT TABLE: [PASTE TABLE]
+SOURCE DATA: [PASTE DATA]
+
+End with a summary of total inconsistencies found and the most critical ones.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: REDACCIÓN Y REVISIÓN / DRAFTING & REVIEW -->
+  <div class="section" id="sec-draft">
+    <div class="section-header">
+      <h2 class="section-title">Redacción y Revisión · Drafting & Review</h2>
+      <span class="section-count">Content Generation</span>
+    </div>
+    <p class="section-desc">Prompts para generar borradores narrativos, revisar coherencia, validar reclamaciones verdes y aplicar técnicas de persona para estresar el contenido.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="general" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Persona</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">El Periodista Escéptico</div>
+        <div class="card-title-en">The Skeptical Reporter</div>
+        <div class="card-use">Detecta indicios de greenwashing, afirmaciones vagas y brechas de datos antes de publicar. Técnica de persona crítica del playbook de Google.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Eres un periodista de investigación altamente escéptico especializado en sostenibilidad corporativa y greenwashing. Has revisado el siguiente extracto de un informe de sostenibilidad: [TEXTO].
+
+Genera las 5 preguntas más incómodas que harías en una rueda de prensa. Para cada pregunta:
+- Indica qué afirmación específica del texto la origina
+- Señala si es un riesgo de greenwashing, un dato no verificable o una omisión relevante
+- Sugiere qué información concreta necesitaría la empresa para responder sólidamente</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">You are a highly skeptical investigative journalist specializing in corporate sustainability and greenwashing. You've reviewed the following sustainability report excerpt: [TEXT].
+
+Generate the 5 most uncomfortable questions you would ask at a press conference. For each question:
+- Identify which specific claim in the text triggers it
+- Flag whether it's a greenwashing risk, an unverifiable claim, or a material omission
+- Suggest what concrete information the company would need to answer it robustly</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general csrd" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Persona</span><span class="tag tag-csrd">CSRD</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">El Inversor de Impacto</div>
+        <div class="card-title-en">The Impact Investor</div>
+        <div class="card-use">Evalúa el informe desde la perspectiva de un inversor ESG enfocado en riesgo financiero climático y doble materialidad.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Eres un analista senior de ESG en un fondo de inversión de impacto europeo. Evalúas informes de sostenibilidad bajo el marco de doble materialidad de la CSRD: impacto de la empresa sobre el medio ambiente (inside-out) e impacto del cambio climático sobre el negocio (outside-in).
+
+Tras leer este extracto: [TEXTO], indica:
+1. ¿Qué riesgos climáticos financieros materiales no están adecuadamente divulgados?
+2. ¿Qué oportunidades de transición no están siendo capitalizadas o reportadas?
+3. ¿Qué métricas necesitarías para incluir esta empresa en el portfolio?
+4. Puntuación de confianza en la divulgación del 1 al 10, con justificación.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">You are a senior ESG analyst at a European impact investment fund. You evaluate sustainability reports under CSRD's double materiality framework: company impact on the environment (inside-out) and climate impact on the business (outside-in).
+
+After reading this excerpt: [TEXT], provide:
+1. Which material climate financial risks are not adequately disclosed?
+2. Which transition opportunities are not being captured or reported?
+3. What metrics would you need to include this company in the portfolio?
+4. Disclosure confidence score 1–10 with justification.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Persona</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">La ONG de Agua y Comunidades</div>
+        <div class="card-title-en">The Water & Communities NGO</div>
+        <div class="card-use">Analiza el informe desde la perspectiva de una ONG centrada en impacto social y ambiental local. Ideal para informes con operaciones en zonas sensibles.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Eres la directora de programas de una ONG de gestión hídrica y derechos de comunidades locales. Acabas de leer la sección de agua y social del siguiente informe de sostenibilidad: [TEXTO].
+
+Genera las principales preguntas que plantearías para entender:
+1. El impacto real sobre cuencas hidrográficas locales (no solo consumo absoluto)
+2. La licencia social para operar: ¿hay consulta real con comunidades?
+3. La cadena de suministro: ¿hay riesgos de conflictos por agua en proveedores?
+4. Compromisos vs. resultados: ¿qué objetivos del año anterior no se cumplieron?
+
+Sé directa y específica. No aceptes respuestas vagas.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">You are the program director of an NGO focused on water management and local community rights. You've just read the water and social section of this sustainability report: [TEXT].
+
+Generate the key questions you would raise to understand:
+1. Actual impact on local watersheds (not just absolute consumption)
+2. Social license to operate: is there genuine community consultation?
+3. Supply chain: are there water-conflict risks among suppliers?
+4. Commitments vs. results: which prior-year targets were not met?
+
+Be direct and specific. Do not accept vague answers.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general csrd" style="--i:3">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Redacción</span></div>
+          <span class="difficulty diff-basic">Básico</span>
+        </div>
+        <div class="card-title">Borrador Narrativo desde Datos</div>
+        <div class="card-title-en">Narrative Draft from Data</div>
+        <div class="card-use">Convierte una tabla de datos ESG en una narrativa estructurada, manteniendo el tono corporativo y la precisión técnica.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como redactor técnico de informes de sostenibilidad corporativa. Convierte los siguientes datos ESG en 3 párrafos narrativos coherentes: [TABLA DE DATOS].
+
+Requisitos:
+- Tono: profesional, preciso, sin hipérboles ni adjetivos vacíos
+- Estructura: contexto → resultados → interpretación o siguiente paso
+- Mantén todas las cifras exactas del original
+- Señala explícitamente las métricas que muestran mejora y las que muestran retroceso
+- Estándar de referencia para esta sección: [GRI / ESRS / VSME - INDICAR CUÁL]</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a technical writer for corporate sustainability reports. Convert the following ESG data into 3 coherent narrative paragraphs: [DATA TABLE].
+
+Requirements:
+- Tone: professional, precise, no hyperbole or empty adjectives
+- Structure: context → results → interpretation or next step
+- Maintain all exact figures from the original
+- Explicitly flag metrics showing improvement and those showing decline
+- Reference standard for this section: [GRI / ESRS / VSME - SPECIFY]</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:4">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Validación</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Validador de Green Claims</div>
+        <div class="card-title-en">Green Claims Validator</div>
+        <div class="card-use">Evalúa si una afirmación de sostenibilidad cumple los criterios de la Directiva Europea de Reivindicaciones Ecológicas (Directiva 2024/825/UE). Reduce el riesgo de greenwashing legal.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como asesor legal especializado en la Directiva Europea de Reivindicaciones Ecológicas (Green Claims Directive, Directiva 2024/825/UE) y la Directiva de Empoderamiento del Consumidor.
+
+Evalúa la siguiente afirmación de sostenibilidad: "[AFIRMACIÓN]"
+
+Para cada criterio de la Directiva, indica si la afirmación cumple (✓), incumple (✗) o es incierta (⚠):
+1. ¿Está basada en evidencia científica reconocida?
+2. ¿Hace referencia a un estándar o metodología verificable?
+3. ¿Está verificada por un tercero acreditado?
+4. ¿Es específica o genérica/vaga?
+5. ¿Podría inducir a error al consumidor sobre el impacto ambiental real?
+
+Concluye con el nivel de riesgo legal (Bajo / Medio / Alto) y las acciones correctoras prioritarias.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a legal advisor specializing in the European Green Claims Directive (Directive 2024/825/EU) and the Consumer Empowerment Directive.
+
+Evaluate the following sustainability claim: "[CLAIM]"
+
+For each Directive criterion, state whether the claim complies (✓), fails (✗) or is uncertain (⚠):
+1. Is it based on recognized scientific evidence?
+2. Does it reference a verifiable standard or methodology?
+3. Has it been verified by an accredited third party?
+4. Is it specific or generic/vague?
+5. Could it mislead consumers about actual environmental impact?
+
+Conclude with legal risk level (Low / Medium / High) and priority corrective actions.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd vsme" style="--i:5">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">CSRD</span><span class="tag tag-vsme">VSME</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Análisis de Doble Materialidad</div>
+        <div class="card-title-en">Double Materiality Analysis</div>
+        <div class="card-use">Estructura el proceso de evaluación de doble materialidad requerido por CSRD/ESRS, desde la perspectiva de impacto (IRO) y financiera.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como consultor senior de CSRD especializado en el proceso de evaluación de doble materialidad (ESRS 1, secciones 3.1-3.2). La empresa es: [NOMBRE], sector: [SECTOR], operaciones en: [PAÍSES/REGIONES].
+
+Realiza los siguientes pasos en orden:
+1. Lista los IROs (Impacts, Risks and Opportunities) potenciales más relevantes para este sector según los ESRS temáticos
+2. Para cada IRO, evalúa (escala 1-5): Escala del impacto | Alcance | Carácter irremediable | Probabilidad (para riesgos)
+3. Clasifica cada IRO como material (impacto) o no material, con justificación
+4. Indica qué estándares ESRS se activarían según los IROs materiales identificados
+
+Presenta en tabla: IRO | Tipo (I/R/O) | Puntuación | Material (S/N) | ESRS activado</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a senior CSRD consultant specializing in the double materiality assessment process (ESRS 1, sections 3.1–3.2). Company: [NAME], sector: [SECTOR], operations in: [COUNTRIES/REGIONS].
+
+Execute the following steps in order:
+1. List the most relevant potential IROs (Impacts, Risks and Opportunities) for this sector per topical ESRS standards
+2. For each IRO, score (1–5 scale): Scale of impact | Scope | Irremediable character | Likelihood (for risks)
+3. Classify each IRO as material or non-material with justification
+4. Indicate which ESRS standards would be triggered by the identified material IROs
+
+Present as table: IRO | Type (I/R/O) | Score | Material (Y/N) | Triggered ESRS</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4: ISO 14001 / HUELLA DE CARBONO -->
+  <div class="section" id="sec-iso">
+    <div class="section-header">
+      <h2 class="section-title">ISO 14001 · Huella de Carbono</h2>
+      <span class="section-count">Compliance & Carbon</span>
+    </div>
+    <p class="section-desc">Prompts para gestión de sistemas ambientales ISO 14001, cálculo de huella de carbono GHG Protocol y planificación de reducción de emisiones.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="iso" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Revisión de Aspectos Ambientales</div>
+        <div class="card-title-en">Environmental Aspects Review</div>
+        <div class="card-use">Identifica y evalúa los aspectos ambientales significativos de una organización según los requisitos del apartado 6.1.2 de ISO 14001:2015.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como auditor líder de ISO 14001:2015. La empresa es [NOMBRE], sector [SECTOR], con las siguientes actividades principales: [LISTA DE ACTIVIDADES].
+
+Siguiendo el requisito 6.1.2 (Aspectos ambientales), realiza:
+1. Identificación de aspectos ambientales para cada actividad (condiciones normales, anormales y de emergencia)
+2. Evaluación de significancia usando criterios: gravedad del impacto × probabilidad de ocurrencia × alcance regulatorio (escala 1-3 cada criterio)
+3. Lista de aspectos significativos que requieren objetivos ambientales
+4. Identificación de requisitos legales aplicables en España/UE para cada aspecto significativo
+
+Formato de salida: tabla con columnas Actividad | Aspecto | Impacto | Puntuación | Significativo | Requisito legal</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ISO 14001:2015 lead auditor. Company: [NAME], sector: [SECTOR], main activities: [ACTIVITY LIST].
+
+Following requirement 6.1.2 (Environmental Aspects), perform:
+1. Identification of environmental aspects for each activity (normal, abnormal and emergency conditions)
+2. Significance evaluation using: impact severity × occurrence likelihood × regulatory scope (scale 1–3 each)
+3. List of significant aspects requiring environmental objectives
+4. Identification of applicable legal requirements (Spain/EU) for each significant aspect
+
+Output table: Activity | Aspect | Impact | Score | Significant | Legal Requirement</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso general" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">GHG Protocol</span><span class="tag tag-general">Scope 3</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Identificación de Categorías Scope 3</div>
+        <div class="card-title-en">Scope 3 Category Identification</div>
+        <div class="card-use">Determina qué categorías de Scope 3 son relevantes y materiales para una empresa específica, priorizando por impacto potencial.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en GHG Protocol Corporate Value Chain (Scope 3) Standard. La empresa es: [NOMBRE], sector: [SECTOR], descripción del modelo de negocio: [DESCRIPCIÓN].
+
+Para cada una de las 15 categorías de Scope 3:
+1. Indica si es relevante para esta empresa (Sí/No/Posiblemente)
+2. Si es relevante, estima el orden de magnitud del impacto potencial (Alto/Medio/Bajo) con justificación
+3. Indica la metodología de cálculo recomendada (gasto-basado, actividad-basado, híbrido)
+4. Señala la fuente de datos primaria necesaria para el cálculo
+
+Ordena el resultado por impacto potencial de mayor a menor. Indica qué categorías son obligatorias bajo CSRD/ESRS E1.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a GHG Protocol Corporate Value Chain (Scope 3) Standard expert. Company: [NAME], sector: [SECTOR], business model: [DESCRIPTION].
+
+For each of the 15 Scope 3 categories:
+1. State whether it is relevant for this company (Yes/No/Possibly)
+2. If relevant, estimate potential impact magnitude (High/Medium/Low) with justification
+3. Recommend calculation methodology (spend-based, activity-based, hybrid)
+4. Identify primary data source needed for calculation
+
+Sort results by potential impact (highest to lowest). Indicate which categories are mandatory under CSRD/ESRS E1.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso general" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Plan de Objetivos Ambientales</div>
+        <div class="card-title-en">Environmental Objectives Plan</div>
+        <div class="card-use">Estructura un plan de objetivos ambientales SMART alineado con los aspectos significativos del SGA y los compromisos de política ambiental.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como consultor de sistemas de gestión ambiental ISO 14001:2015. A partir de los siguientes aspectos ambientales significativos: [LISTA DE ASPECTOS], y la política ambiental de la empresa: [POLÍTICA], desarrolla un plan de objetivos ambientales.
+
+Para cada objetivo, define según el requisito 6.2.1:
+- Objetivo: qué se quiere lograr (SMART: específico, medible, alcanzable, relevante, temporal)
+- Indicador KPI y unidad de medida
+- Línea base y meta para [AÑO]
+- Recursos necesarios (responsable, presupuesto estimado)
+- Hitos de seguimiento trimestrales
+- Vinculación con aspecto ambiental significativo
+
+Incluye una columna de alineación con ODS de Naciones Unidas relevantes.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ISO 14001:2015 environmental management consultant. Based on the following significant environmental aspects: [ASPECTS LIST], and the company's environmental policy: [POLICY], develop an environmental objectives plan.
+
+For each objective, define per requirement 6.2.1:
+- Objective: what to achieve (SMART: specific, measurable, achievable, relevant, time-bound)
+- KPI indicator and unit of measure
+- Baseline and target for [YEAR]
+- Required resources (owner, estimated budget)
+- Quarterly monitoring milestones
+- Link to significant environmental aspect
+
+Include a column aligning with relevant UN Sustainable Development Goals.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5: ESRS TEMÁTICOS -->
+  <div class="section" id="sec-esrs">
+    <div class="section-header">
+      <h2 class="section-title">ESRS Temáticos · Topical ESRS</h2>
+      <span class="section-count">CSRD · Content Generation</span>
+    </div>
+    <p class="section-desc">Prompts especializados por cada estándar ESRS temático. Un prompt por norma, diseñado para extraer el máximo valor de la IA en cada tema de sostenibilidad obligatorio bajo CSRD.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="csrd" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">ESRS E1</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Plan de Transición Climática (E1)</div>
+        <div class="card-title-en">Climate Transition Plan (E1)</div>
+        <div class="card-use">Estructura el plan de transición climática requerido por ESRS E1-1, incluyendo objetivos, hitos y alineación con escenarios 1.5°C.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como consultor senior de CSRD especializado en ESRS E1 (Cambio Climático). La empresa es [NOMBRE], sector [SECTOR], con emisiones actuales de [X tCO2e/año] y los siguientes compromisos climáticos existentes: [COMPROMISOS].
+
+Desarrolla un borrador del Plan de Transición Climática según ESRS E1-1, que incluya:
+1. Objetivos de reducción de emisiones (Scope 1, 2 y 3 relevantes) alineados con escenarios de 1.5°C o 2°C
+2. Hitos intermedios para 2025, 2027 y 2030
+3. Palancas de descarbonización por orden de impacto potencial para este sector
+4. Inversiones y recursos necesarios (estimación de orden de magnitud)
+5. Métricas de seguimiento anuales
+6. Riesgos de transición identificados (regulatorio, tecnológico, mercado)
+
+Señala explícitamente qué partes requieren datos que la empresa aún debe recopilar.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a senior CSRD consultant specializing in ESRS E1 (Climate Change). Company: [NAME], sector: [SECTOR], current emissions: [X tCO2e/year], existing climate commitments: [COMMITMENTS].
+
+Draft a Climate Transition Plan per ESRS E1-1, including:
+1. Emission reduction targets (Scope 1, 2 and relevant Scope 3) aligned with 1.5°C or 2°C scenarios
+2. Intermediate milestones for 2025, 2027 and 2030
+3. Decarbonization levers ranked by potential impact for this sector
+4. Required investments and resources (order-of-magnitude estimate)
+5. Annual monitoring metrics
+6. Identified transition risks (regulatory, technological, market)
+
+Explicitly flag which parts require data the company still needs to collect.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">ESRS E2</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Contaminación: Sustancias Preocupantes (E2)</div>
+        <div class="card-title-en">Pollution: Substances of Concern (E2)</div>
+        <div class="card-use">Identifica y evalúa los impactos de contaminación relevantes bajo ESRS E2, con foco en sustancias preocupantes y emisiones al aire, agua y suelo.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en ESRS E2 (Contaminación) y legislación ambiental europea (Directiva de Emisiones Industriales, Reglamento REACH, Reglamento CLP). La empresa opera en [SECTOR] con las siguientes actividades: [ACTIVIDADES].
+
+Analiza y estructura:
+1. Inventario de posibles fuentes de contaminación: emisiones al aire, vertidos al agua, contaminación del suelo, contaminantes de preocupación (SVHC según REACH)
+2. Para cada fuente: marco regulatorio aplicable en España/UE y límites legales relevantes
+3. Evaluación de significancia del impacto (escala 1-5: frecuencia × gravedad × reversibilidad)
+4. Datapoints específicos de ESRS E2 que aplican a esta empresa
+5. Indicadores de seguimiento recomendados y fuente de datos para cada uno
+
+Distingue entre impactos propios de las operaciones e impactos en la cadena de valor.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESRS E2 (Pollution) and European environmental law expert (Industrial Emissions Directive, REACH Regulation, CLP Regulation). Company sector: [SECTOR], activities: [ACTIVITIES].
+
+Analyze and structure:
+1. Inventory of potential pollution sources: air emissions, water discharges, soil contamination, substances of concern (SVHC per REACH)
+2. For each source: applicable regulatory framework in Spain/EU and relevant legal limits
+3. Impact significance assessment (scale 1–5: frequency × severity × reversibility)
+4. Specific ESRS E2 datapoints applicable to this company
+5. Recommended monitoring indicators and data source for each
+
+Distinguish between impacts from own operations and value chain impacts.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">ESRS E3</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Gestión del Agua y Recursos Marinos (E3)</div>
+        <div class="card-title-en">Water & Marine Resources (E3)</div>
+        <div class="card-use">Evalúa la exposición hídrica y los impactos en recursos de agua dulce y marinos según ESRS E3, con foco en zonas de estrés hídrico.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en ESRS E3 (Agua y Recursos Marinos) y herramientas de evaluación hídrica (WRI Aqueduct, WWAP). La empresa opera en [UBICACIONES] con consumo de agua de [X m³/año] procedente de [FUENTES].
+
+Desarrolla una evaluación que incluya:
+1. Análisis de estrés hídrico de las ubicaciones usando WRI Aqueduct (clasifica cada sede como: estrés bajo/medio/alto/muy alto)
+2. Inventario de usos del agua: consumo, recirculación, descarga, fuentes de extracción
+3. Impactos identificados en ecosistemas acuáticos (ríos, acuíferos, zonas costeras)
+4. Datapoints de ESRS E3 aplicables y nivel de cobertura actual
+5. Objetivos hídricos recomendados: eficiencia, reutilización, restauración de caudales
+6. Comparativa con el objetivo de 120% de reposición hídrica como referencia de ambición (benchmark Google 2025)
+
+Indica si alguna instalación está en zona de escasez hídrica según la Directiva Marco del Agua (UE).</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESRS E3 (Water and Marine Resources) expert familiar with water assessment tools (WRI Aqueduct, WWAP). Company locations: [LOCATIONS], water consumption: [X m³/year] from [SOURCES].
+
+Develop an assessment including:
+1. Water stress analysis of locations using WRI Aqueduct (classify each site: low/medium/high/extremely high stress)
+2. Water use inventory: consumption, recirculation, discharge, extraction sources
+3. Identified impacts on aquatic ecosystems (rivers, aquifers, coastal zones)
+4. Applicable ESRS E3 datapoints and current coverage level
+5. Recommended water targets: efficiency, reuse, flow restoration
+6. Comparison with 120% water replenishment target as ambition benchmark (Google 2025 reference)
+
+Flag any facility located in a water scarcity zone per the EU Water Framework Directive.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd" style="--i:3">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">ESRS E4</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Biodiversidad y Ecosistemas (E4)</div>
+        <div class="card-title-en">Biodiversity & Ecosystems (E4)</div>
+        <div class="card-use">Evalúa los impactos y dependencias en biodiversidad según ESRS E4, alineado con el Marco Global de Biodiversidad Kunming-Montreal y TNFD.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en ESRS E4 (Biodiversidad y Ecosistemas) y marcos como TNFD (Taskforce on Nature-related Financial Disclosures) y el Marco Kunming-Montreal. La empresa opera en [SECTOR] con instalaciones en [UBICACIONES].
+
+Estructura una evaluación de biodiversidad que incluya:
+1. Identificación de sitios en o adyacentes a áreas protegidas (Red Natura 2000, IBA, RAMSAR)
+2. Dependencias de la empresa en servicios ecosistémicos (polinización, agua, suelo, materias primas)
+3. Impactos directos e indirectos sobre biodiversidad por actividad
+4. Aplicación del marco LEAP (Locate → Evaluate → Assess → Prepare) del TNFD
+5. Métricas de biodiversidad aplicables: huella de tierra, Mean Species Abundance (MSA), pérdida de hábitat
+6. Datapoints obligatorios de ESRS E4 y cuáles requieren evaluación de materialidad previa
+
+Señala alineación con el objetivo 30x30 del Marco Kunming-Montreal donde sea relevante.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESRS E4 (Biodiversity and Ecosystems) expert familiar with TNFD and the Kunming-Montreal Global Biodiversity Framework. Company sector: [SECTOR], facilities at: [LOCATIONS].
+
+Structure a biodiversity assessment including:
+1. Identification of sites in or adjacent to protected areas (Natura 2000, IBA, RAMSAR)
+2. Company dependencies on ecosystem services (pollination, water, soil, raw materials)
+3. Direct and indirect biodiversity impacts by activity
+4. Application of TNFD's LEAP framework (Locate → Evaluate → Assess → Prepare)
+5. Applicable biodiversity metrics: land footprint, Mean Species Abundance (MSA), habitat loss
+6. Mandatory ESRS E4 datapoints and which require prior materiality assessment
+
+Flag alignment with the Kunming-Montreal 30x30 target where relevant.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd" style="--i:4">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">ESRS S1</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Fuerza Laboral Propia (S1)</div>
+        <div class="card-title-en">Own Workforce (S1)</div>
+        <div class="card-use">Estructura la divulgación de métricas sociales de la plantilla propia según ESRS S1, incluyendo condiciones de trabajo, diversidad y diálogo social.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en ESRS S1 (Fuerza Laboral Propia) y legislación laboral española. La empresa tiene [X] empleados en [PAÍSES], con la siguiente estructura: [DESCRIBIR BREVEMENTE tipo de contratos, género, antigüedad].
+
+Desarrolla una guía de divulgación ESRS S1 que cubra:
+1. Características de la plantilla: headcount por tipo de contrato (indefinido/temporal), género, país, jornada (completa/parcial)
+2. Condiciones de trabajo: salario medio vs. salario mínimo local, brecha salarial de género, horas extras
+3. Salud y seguridad: tasa de accidentes (LTIFR), enfermedades profesionales, días perdidos
+4. Diálogo social: cobertura de convenios colectivos, representación sindical
+5. Formación: horas de formación por empleado, inversión en desarrollo profesional
+6. Datapoints ESRS S1 que requieren encuesta a empleados vs. los que pueden obtenerse de RRHH directamente
+
+Indica cuáles de estos datos son obligatorios para todas las empresas y cuáles son condicionales.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESRS S1 (Own Workforce) and Spanish labor law expert. Company has [X] employees in [COUNTRIES], structure: [BRIEFLY DESCRIBE contract types, gender, seniority].
+
+Develop an ESRS S1 disclosure guide covering:
+1. Workforce characteristics: headcount by contract type (permanent/temporary), gender, country, working time (full/part)
+2. Working conditions: average wage vs. local minimum wage, gender pay gap, overtime
+3. Health and safety: accident rate (LTIFR), occupational diseases, lost days
+4. Social dialogue: collective bargaining coverage, union representation
+5. Training: training hours per employee, investment in professional development
+6. ESRS S1 datapoints requiring employee survey vs. those obtainable directly from HR
+
+Indicate which data are mandatory for all companies and which are conditional.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="csrd" style="--i:5">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-csrd">ESRS G1</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Conducta Empresarial y Ética (G1)</div>
+        <div class="card-title-en">Business Conduct & Ethics (G1)</div>
+        <div class="card-use">Estructura las divulgaciones de gobernanza y conducta empresarial requeridas por ESRS G1, incluyendo anticorrupción, protección de denunciantes y cadena de suministro.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en ESRS G1 (Conducta Empresarial) y cumplimiento normativo (compliance). La empresa es [NOMBRE], sector [SECTOR], con [X] proveedores activos y operaciones en [PAÍSES].
+
+Revisa y estructura las divulgaciones de ESRS G1 sobre:
+1. Cultura corporativa y código de conducta: ¿existe? ¿está disponible para terceros? ¿hay formación obligatoria?
+2. Gestión de relaciones con proveedores: ¿hay cláusulas ESG en contratos? ¿due diligence de proveedores?
+3. Prevención de corrupción y soborno: sistemas de control interno, incidentes registrados en el período
+4. Protección de denunciantes (whistleblowing): ¿hay canal formal? ¿anonimato garantizado? (Directiva UE 2019/1937)
+5. Incidentes de conducta empresarial: número, tipología, resolución
+6. Pagos a partidos políticos: política y datos del período
+
+Para cada área indica: estado actual estimado (Implementado/Parcial/Ausente) y acción recomendada prioritaria.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESRS G1 (Business Conduct) and compliance expert. Company: [NAME], sector: [SECTOR], [X] active suppliers, operations in [COUNTRIES].
+
+Review and structure ESRS G1 disclosures on:
+1. Corporate culture and code of conduct: does it exist? Available to third parties? Mandatory training?
+2. Supplier relationship management: ESG clauses in contracts? Supplier due diligence?
+3. Corruption and bribery prevention: internal controls, incidents recorded in the period
+4. Whistleblower protection: formal channel? Anonymity guaranteed? (EU Directive 2019/1937)
+5. Business conduct incidents: number, type, resolution
+6. Payments to political parties: policy and period data
+
+For each area indicate: estimated current status (Implemented/Partial/Absent) and priority recommended action.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 6: TÉCNICAS DEL PLAYBOOK DE GOOGLE -->
+  <div class="section" id="sec-google">
+    <div class="section-header">
+      <h2 class="section-title">Técnicas del AI Playbook · Google Techniques</h2>
+      <span class="section-count">Content Generation · Content Interaction</span>
+    </div>
+    <p class="section-desc">Prompts basados directamente en técnicas documentadas en el AI Playbook for Sustainability Reporting de Google (diciembre 2025): Mock Scoring, Inquiry Response, Accessibility, Content Localization y Reactive Communications.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="general" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Mock Scoring</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Puntuación Simulada de Agencia de Rating</div>
+        <div class="card-title-en">Mock ESG Rating Score</div>
+        <div class="card-use">Técnica del AI Playbook de Google. Evalúa un borrador de informe contra criterios de una agencia de rating ESG para anticipar la puntuación antes de publicar.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Mock Scoring (Google AI Playbook)</div>
+          <div class="prompt-text">Actúa como analista de una agencia de rating ESG (simula el modelo de [MSCI / Sustainalytics / EcoVadis — ELIGE UNO]). Has recibido el siguiente borrador: [TEXTO].
+
+Evalúa el contenido contra los criterios típicos de esta agencia:
+1. Completitud de divulgación: ¿responde las preguntas clave del cuestionario?
+2. Calidad de los datos: ¿son verificables, comparables y consistentes?
+3. Ambición de los objetivos: ¿alineados con mejores prácticas del sector?
+4. Evidencia de implementación: ¿métricas de resultado o solo compromisos?
+
+Para cada criterio: Puntuación (1-10) | Justificación | Qué cambio específico mejoraría la puntuación.
+Concluye con la puntuación global estimada y las 3 mejoras de mayor impacto en el rating.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Mock Scoring (Google AI Playbook)</div>
+          <div class="prompt-text en">Act as an ESG rating agency analyst (simulate [MSCI / Sustainalytics / EcoVadis — CHOOSE ONE]). Review this draft: [TEXT].
+
+Evaluate against this agency's typical criteria:
+1. Disclosure completeness: answers the agency questionnaire's key questions?
+2. Data quality: verifiable, comparable and consistent with prior periods?
+3. Target ambition: aligned with sector best practices?
+4. Implementation evidence: outcome metrics or only commitments?
+
+For each: Score (1–10) | Justification | Specific change that would improve the score.
+Conclude with overall estimated score and 3 highest-impact rating improvements.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Inquiry Response</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Respuesta a Cuestionarios ESG de Clientes</div>
+        <div class="card-title-en">Customer ESG Questionnaire Response</div>
+        <div class="card-use">Técnica del AI Playbook de Google. Genera respuestas precisas a cuestionarios de sostenibilidad basándose estrictamente en documentos publicados — sin inventar datos.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Inquiry Response (Google AI Playbook)</div>
+          <div class="prompt-text">Actúa como responsable de sostenibilidad. Tienes acceso ÚNICAMENTE a estos documentos publicados: [PEGAR INFORME / POLÍTICA / DATOS ESG].
+
+Un cliente ha enviado este cuestionario: [PEGAR PREGUNTAS].
+
+Para cada pregunta:
+1. Responde usando SOLO los documentos proporcionados (no inventes datos)
+2. Cita la fuente exacta (sección, página o tabla)
+3. Si la información no está disponible: "Dato no disponible en documentos publicados actuales"
+4. Si la respuesta es parcial, indica qué cubre y qué falta
+
+Formato: tabla Pregunta | Respuesta | Fuente | Estado (Completa/Parcial/No disponible)</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Inquiry Response (Google AI Playbook)</div>
+          <div class="prompt-text en">Act as sustainability manager. You have access ONLY to these published documents: [PASTE REPORT / POLICY / ESG DATA].
+
+A client sent this questionnaire: [PASTE QUESTIONS].
+
+For each question:
+1. Answer using ONLY the provided documents (do not invent data)
+2. Cite the exact source (section, page or table)
+3. If unavailable: "Data not available in current published documents"
+4. If partial, indicate what is covered and what is missing
+
+Format: table Question | Answer | Source | Status (Complete/Partial/Not available)</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Accessibility</span></div>
+          <span class="difficulty diff-basic">Básico</span>
+        </div>
+        <div class="card-title">Alt-Text para Gráficos de Sostenibilidad</div>
+        <div class="card-title-en">Alt-Text for Sustainability Charts</div>
+        <div class="card-use">Técnica del AI Playbook de Google. Genera texto alternativo descriptivo para imágenes y gráficos de informes de sostenibilidad, cumpliendo WCAG 2.1.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Accessibility (Google AI Playbook)</div>
+          <div class="prompt-text">Analiza la siguiente imagen o gráfico: [ADJUNTAR IMAGEN o DESCRIBIR EL GRÁFICO].
+
+Genera:
+1. Alt-text corto (máx. 125 caracteres): descripción concisa para atributo alt HTML, enfocada en el dato principal
+2. Descripción larga (aria-describedby): 2-3 frases cubriendo todos los valores, tendencias y contexto
+3. Revisión de lenguaje visual en el texto circundante ("como se puede ver", "en el gráfico de arriba"): identifica estas frases y propone alternativas inclusivas
+
+El alt-text debe cumplir WCAG 2.1 nivel AA.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Accessibility (Google AI Playbook)</div>
+          <div class="prompt-text en">Analyze the following image or chart: [ATTACH IMAGE or DESCRIBE CHART].
+
+Generate:
+1. Short alt-text (max 125 chars): concise description for HTML alt attribute, focused on main data point
+2. Long description (aria-describedby): 2–3 sentences covering all values, trends and context
+3. Review of visual-ability language in surrounding text ("as you can see", "in the chart above"): identify and propose inclusive alternatives
+
+Alt-text must comply with WCAG 2.1 level AA.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:3">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Localization</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Adaptación Regional de Contenido ESG</div>
+        <div class="card-title-en">ESG Content Regional Localization</div>
+        <div class="card-use">Técnica del AI Playbook de Google. Adapta el contenido del informe para audiencias y contextos regulatorios regionales específicos (España, LATAM, México, Colombia).</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Content Localization (Google AI Playbook)</div>
+          <div class="prompt-text">Actúa como especialista en comunicación de sostenibilidad para el mercado [España / LATAM / México / Colombia — INDICA CUÁL].
+
+Adapta este contenido: [TEXTO ORIGINAL].
+
+La adaptación debe:
+1. Ajustar terminología al uso local (diferencias entre España y LATAM en sostenibilidad)
+2. Referenciar el marco regulatorio local (España: Ley 7/2021, CNMV, MITECO; Colombia: UPRA, UPME)
+3. Adaptar ejemplos y benchmarks a referencias comprensibles para la audiencia local
+4. Mantener todas las cifras del original sin modificación
+5. Ajustar el tono: más formal para España corporativa, más cercano para PYMEs latinoamericanas
+
+Entrega el texto adaptado con notas entre corchetes explicando cada decisión de localización.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Content Localization (Google AI Playbook)</div>
+          <div class="prompt-text en">Act as a sustainability communications specialist for the [Spain / LATAM / Mexico / Colombia — SPECIFY] market.
+
+Adapt this content: [ORIGINAL TEXT].
+
+The adaptation must:
+1. Adjust terminology to local usage (regional differences between Spain and LATAM)
+2. Reference the relevant local regulatory framework (Spain: Ley 7/2021, CNMV, MITECO; Colombia: UPRA, UPME)
+3. Adjust examples and benchmarks to locally comprehensible references
+4. Maintain all original figures without modification
+5. Adapt tone: more formal for corporate Spain, more approachable for Latin American SMEs
+
+Deliver adapted text with bracketed notes explaining each localization decision.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:4">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Reactive Comms</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">FAQs y Puntos de Conversación para Directivos</div>
+        <div class="card-title-en">FAQs & Executive Talking Points</div>
+        <div class="card-use">Técnica del AI Playbook de Google. Prepara a directivos con preguntas difíciles anticipadas y respuestas respaldadas por datos concretos del informe.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Reactive Communications (Google AI Playbook)</div>
+          <div class="prompt-text">Actúa como asesor de comunicación preparando a un directivo para una rueda de prensa o reunión con inversores sobre el informe: [TEXTO DEL INFORME].
+
+Genera un briefing ejecutivo con:
+1. Las 5 preguntas más difíciles de periodistas, inversores u ONGs
+2. Para cada pregunta: respuesta preparada (máx. 3 párrafos) con datos específicos del informe
+3. Puntos de apertura (2-3 frases) para cuando el directivo tome la palabra
+4. Posibles objeciones de greenwashing y cómo responderlas con evidencia
+5. Temas que el directivo debe evitar o manejar con precaución
+
+Cada respuesta debe estar respaldada por datos concretos del informe.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Reactive Communications (Google AI Playbook)</div>
+          <div class="prompt-text en">Act as a communications advisor preparing an executive for a press conference or investor meeting about this report: [REPORT TEXT].
+
+Generate an executive briefing with:
+1. The 5 hardest questions from journalists, investors or NGOs
+2. For each: prepared answer (max 3 paragraphs) with specific report data
+3. Opening talking points (2–3 sentences) for when the executive takes the floor
+4. Potential greenwashing objections and evidence-based responses
+5. Topics the executive should avoid or handle carefully
+
+Each answer must be backed by specific report data.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="general" style="--i:5">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-general">Benchmarking</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Análisis de Pares del Sector</div>
+        <div class="card-title-en">Sector Peer Benchmarking</div>
+        <div class="card-use">Basado en la técnica Peer Benchmarking del AI Playbook de Google. Compara métricas ESG propias contra referentes del sector para identificar posición competitiva.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Peer Benchmarking (Google AI Playbook)</div>
+          <div class="prompt-text">Actúa como analista senior de ESG especializado en benchmarking sectorial. Empresa: [NOMBRE], sector: [SECTOR], métricas ESG clave: [LISTA CON VALORES].
+
+Realiza un análisis comparativo:
+1. Identifica 3-5 competidores o líderes del sector como referencia
+2. Para cada métrica: ¿dónde se sitúa la empresa vs. media del sector? ¿vs. líderes?
+3. Clasifica: Fortaleza (top quartile) / En línea con sector / Por debajo / Sin datos comparables
+4. Identifica las 3 métricas con mayor brecha respecto a líderes
+5. Sugiere fuentes para verificar datos de referencia (CDP, MSCI, Sustainalytics, informes anuales)
+
+Sé explícito cuando uses estimaciones o cuando los datos de referencia sean de años diferentes.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Peer Benchmarking (Google AI Playbook)</div>
+          <div class="prompt-text en">Act as a senior ESG analyst specializing in sector benchmarking. Company: [NAME], sector: [SECTOR], key ESG metrics: [LIST WITH VALUES].
+
+Conduct a comparative analysis:
+1. Identify 3–5 sector competitors or leaders as benchmarks
+2. For each metric: company vs. sector average? vs. leaders?
+3. Classify: Competitive strength (top quartile) / In line / Below sector / No comparable data
+4. Identify 3 metrics with largest gap vs. sector leaders
+5. Suggest sources to verify benchmark data (CDP, MSCI, Sustainalytics, annual reports)
+
+Be explicit when using estimates or when benchmark data is from different years.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 7: VSME AVANZADO -->
+  <div class="section" id="sec-vsme">
+    <div class="section-header">
+      <h2 class="section-title">VSME Avanzado · Advanced VSME</h2>
+      <span class="section-count">VSME · EFRAG · PYMEs</span>
+    </div>
+    <p class="section-desc">Prompts especializados para el estándar voluntario VSME de EFRAG, diseñado para PYMEs europeas. Cubre Módulo B, Módulo T y la relación con la cadena de valor CSRD.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="vsme" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME Módulo B</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Diagnóstico Completo Módulo B</div>
+        <div class="card-title-en">Full Module B Diagnostic</div>
+        <div class="card-use">Evalúa la cobertura de los 4 bloques del Módulo Básico VSME (B1-B4) con diagnóstico de priorización para PYMEs que inician su reporte de sostenibilidad.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como consultor especializado en el estándar VSME (Voluntary Sustainability Reporting Standard for SMEs) de EFRAG (2024). PYME: [NOMBRE], sector: [SECTOR], [X] empleados, facturación: [€X].
+
+Evalúa la preparación para el Módulo B en sus 4 bloques:
+
+B1 — BASE: Modelo de negocio, cadena de valor, estrategia de sostenibilidad
+B2 — MEDIO AMBIENTE: Energía, GEI, agua, residuos, biodiversidad básica
+B3 — SOCIAL: Condiciones laborales, salud y seguridad, derechos humanos
+B4 — GOBERNANZA: Estructura de gobierno, conducta, gestión de riesgos ESG
+
+Para cada bloque:
+- Lista los datapoints requeridos
+- Disponibilidad de datos (Disponible/Parcial/No disponible)
+- Esfuerzo para completar (Bajo/Medio/Alto)
+- Responsable interno recomendado
+
+Concluye con un roadmap de 3 fases priorizando por impacto y facilidad.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as a consultant specializing in EFRAG's VSME (Voluntary Sustainability Reporting Standard for SMEs, 2024). SME: [NAME], sector: [SECTOR], [X] employees, revenue: [€X].
+
+Evaluate readiness for Module B across its 4 blocks:
+
+B1 — BASE: Business model, value chain, sustainability strategy
+B2 — ENVIRONMENT: Energy, GHG, water, waste, basic biodiversity
+B3 — SOCIAL: Working conditions, health & safety, human rights
+B4 — GOVERNANCE: Governance structure, conduct, ESG risk management
+
+For each block:
+- List required datapoints
+- Data availability (Available/Partial/Not available)
+- Completion effort (Low/Medium/High)
+- Recommended internal owner
+
+Conclude with a 3-phase implementation roadmap prioritized by impact and feasibility.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME Módulo T</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Módulo Temático: Clima y Energía</div>
+        <div class="card-title-en">Thematic Module: Climate & Energy</div>
+        <div class="card-use">Desarrolla los datapoints del Módulo Temático T del VSME sobre clima y energía, para PYMEs que quieren ir más allá del reporte básico.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como experto en el Módulo Temático T del estándar VSME de EFRAG, temas T-Clima y T-Energía. PYME: sector [SECTOR], consumo energético [X kWh/año], emisiones estimadas [Y tCO2e/año].
+
+Desarrolla los contenidos del Módulo T:
+
+T-CLIMA:
+- Riesgos físicos (eventos extremos, temperatura) en instalaciones de [UBICACIÓN]
+- Riesgos de transición (regulación de carbono, cambios en demanda)
+- Objetivos de reducción con horizonte temporal
+- Alineación con la taxonomía verde de la UE (si aplica)
+
+T-ENERGÍA:
+- Desglose de consumo por fuente (electricidad, gas, diésel, renovables)
+- Intensidad energética (kWh por unidad de producción o empleado)
+- Objetivos de eficiencia y transición a renovables
+- Certificados de origen y garantías de renovabilidad actuales
+
+Para cada datapoint indica si es obligatorio o voluntario en el Módulo T.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an expert in EFRAG VSME's Thematic Module T, T-Climate and T-Energy topics. SME: sector [SECTOR], energy consumption [X kWh/year], estimated emissions [Y tCO2e/year].
+
+Develop Module T content:
+
+T-CLIMATE:
+- Physical risks (extreme events, temperatures) at [LOCATION] facilities
+- Transition risks (carbon regulation, demand changes)
+- Reduction targets with time horizons
+- EU Taxonomy alignment (if applicable)
+
+T-ENERGY:
+- Consumption breakdown by source (electricity, gas, diesel, renewables)
+- Energy intensity (kWh per production unit or employee)
+- Efficiency and renewable transition targets
+- Current renewable energy certificates and guarantees of origin
+
+For each datapoint indicate whether mandatory or voluntary in Module T.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme csrd" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME</span><span class="tag tag-csrd">CSRD</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Preparación PYME para Cadena de Valor CSRD</div>
+        <div class="card-title-en">SME Preparation for CSRD Value Chain</div>
+        <div class="card-use">Ayuda a PYMEs proveedoras a preparar la información que les pedirán sus clientes grandes sujetos a CSRD, usando VSME como puente hacia el cumplimiento indirecto.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES</div>
+          <div class="prompt-text">Actúa como consultor ESG especializado en el impacto de la CSRD en la cadena de valor y en cómo el VSME ayuda a las PYMEs proveedoras a prepararse.
+
+PYME: [NOMBRE], proveedor de [EMPRESA GRANDE / SECTOR DEL CLIENTE], sujeta a CSRD.
+
+Estructura el análisis en 5 partes:
+1. Qué información ESG necesitará probablemente el cliente CSRD de esta PYME (según ESRS 1 y estándares temáticos del sector del cliente)
+2. Cuáles de esos datapoints cubre el VSME Módulo B sin esfuerzo adicional
+3. Qué información adicional del cliente no está en el Módulo B básico (y qué Módulo T o fuente alternativa puede cubrirlo)
+4. Cómo estructurar una "ficha ESG de proveedor" que la PYME pueda enviar eficientemente a múltiples clientes
+5. Cronograma de preparación dado que el cliente necesita esta información en [AÑO]</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN</div>
+          <div class="prompt-text en">Act as an ESG consultant specializing in CSRD's impact on value chains and how VSME helps SME suppliers prepare.
+
+SME: [NAME], supplier to [LARGE COMPANY / CLIENT SECTOR], subject to CSRD.
+
+Structure the analysis in 5 parts:
+1. What ESG value chain information the CSRD client will likely need from this SME (per ESRS 1 and relevant topical standards)
+2. Which datapoints VSME Module B already covers without additional effort
+3. What additional client-required information is not in basic Module B (and which Module T or alternative source covers it)
+4. How to structure an "SME ESG supplier fact sheet" for efficient multi-client use
+5. Preparation timeline given the client needs this information by [YEAR]</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- SECCIÓN 8: VSME AVANZADO II — Módulo Comprensivo y Operativo -->
+  <div class="section" id="sec-vsme-adv">
+    <div class="section-header">
+      <h2 class="section-title">VSME · Módulo Comprensivo</h2>
+      <span class="section-count">VSME / EFRAG · Comprehensive Module C1–C9</span>
+    </div>
+    <p class="section-desc">Prompts para el Módulo Comprensivo del VSME (C1–C9), el XBRL Digital Template (v1.1.1, feb. 2026), y los Supporting Guides oficiales de EFRAG. Técnicas: RACE, Chain-of-Thought, Few-Shot y Role-based prompting del AI Playbook de Google.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="vsme" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME C1</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Estrategia de Sostenibilidad y Modelo de Negocio (C1)</div>
+        <div class="card-title-en">Sustainability Strategy & Business Model (C1)</div>
+        <div class="card-use">Técnica RACE. Desarrolla la divulgación C1 del Módulo Comprensivo VSME sobre estrategia de sostenibilidad y modelo de negocio, integrando los 10 temas de sostenibilidad del Anexo B del estándar EFRAG.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: RACE (Role · Action · Context · Expectation)</div>
+          <div class="prompt-text">ROL: Actúa como consultor senior especializado en el estándar VSME de EFRAG (diciembre 2024) y su Módulo Comprensivo.
+
+ACCIÓN: Desarrolla la divulgación C1 (Estrategia de Sostenibilidad) para la empresa descrita.
+
+CONTEXTO: Empresa [NOMBRE], sector [SECTOR], [X] empleados, facturación [€X], mercados: [PAÍSES]. Compromisos de sostenibilidad existentes: [DESCRIBIR O INDICAR "ninguno formal"]. Los 10 temas de sostenibilidad del Anexo B del VSME son: cambio climático, contaminación, agua, biodiversidad, uso de recursos/economía circular, fuerza laboral propia, trabajadores en la cadena de valor, comunidades afectadas, consumidores, conducta empresarial.
+
+EXPECTATIVA: Genera una divulgación C1 estructurada que incluya:
+1. Descripción del modelo de negocio y cadena de valor (upstream/downstream)
+2. Para cada uno de los 10 temas del Anexo B: evaluación de relevancia (Alta/Media/Baja/No aplica) con justificación basada en el sector
+3. Los 3 temas más materiales para esta empresa, con argumentación
+4. Objetivos estratégicos de sostenibilidad a corto (1 año), medio (3 años) y largo plazo (2030+)
+5. Cómo la estrategia de sostenibilidad se integra en la toma de decisiones del negocio
+
+Señala con [DATO PENDIENTE] cualquier información que la empresa deba recopilar.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: RACE (Role · Action · Context · Expectation)</div>
+          <div class="prompt-text en">ROLE: Act as a senior consultant specializing in EFRAG's VSME standard (December 2024) and its Comprehensive Module.
+
+ACTION: Develop the C1 disclosure (Sustainability Strategy) for the described company.
+
+CONTEXT: Company [NAME], sector [SECTOR], [X] employees, revenue [€X], markets: [COUNTRIES]. Existing sustainability commitments: [DESCRIBE OR INDICATE "none formal"]. The 10 sustainability topics from VSME Annex B are: climate change, pollution, water, biodiversity, resource use/circular economy, own workforce, workers in the value chain, affected communities, consumers, business conduct.
+
+EXPECTATION: Generate a structured C1 disclosure including:
+1. Business model and value chain description (upstream/downstream)
+2. For each of the 10 Annex B topics: relevance assessment (High/Medium/Low/N/A) with sector-based justification
+3. The 3 most material topics for this company, with reasoning
+4. Strategic sustainability objectives: short-term (1 year), medium (3 years), long-term (2030+)
+5. How the sustainability strategy integrates into business decision-making
+
+Flag with [DATA PENDING] any information the company still needs to collect.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME C2</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Prácticas y Políticas de Transición Sostenible (C2)</div>
+        <div class="card-title-en">Transition Practices & Policies (C2)</div>
+        <div class="card-use">Técnica Few-Shot con casos del Supporting Guide oficial de EFRAG. Desarrolla la divulgación C2 del VSME sobre prácticas, políticas e iniciativas futuras para la transición sostenible.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Few-Shot + Role (Supporting Guide EFRAG C2)</div>
+          <div class="prompt-text">Actúa como consultor VSME especializado en la divulgación C2 del Módulo Comprensivo (EFRAG, 2024). El Supporting Guide oficial de EFRAG para C2 distingue entre: (a) Prácticas: acciones concretas ya implementadas, (b) Políticas: compromisos formales escritos, (c) Iniciativas futuras: planes con horizonte temporal definido.
+
+EJEMPLO del Supporting Guide (formato esperado):
+- Tema: Cambio Climático | Tipo: Práctica | Descripción: "Sustitución de flota de vehículos por vehículos eléctricos (40% completado a dic. 2024)" | Indicador de seguimiento: % flota electrificada | Meta: 100% en 2027
+
+Usando este formato como referencia, desarrolla la divulgación C2 para la empresa [NOMBRE] en los temas materiales identificados: [LISTA DE TEMAS DEL ANEXO B MATERIALES].
+
+Para cada tema material genera al menos:
+- 1 práctica ya implementada (con evidencia verificable)
+- 1 política formal (o indica si está pendiente de formalizar)
+- 1 iniciativa futura con horizonte temporal concreto y KPI de seguimiento
+
+Ordena por nivel de impacto potencial en la transición sostenible. Indica si la información está alineada con el GHG Protocol para los temas de emisiones.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Few-Shot + Role (EFRAG C2 Supporting Guide)</div>
+          <div class="prompt-text en">Act as a VSME consultant specializing in C2 disclosure from the Comprehensive Module (EFRAG, 2024). EFRAG's official C2 Supporting Guide distinguishes: (a) Practices: concrete actions already implemented, (b) Policies: formal written commitments, (c) Future initiatives: plans with defined time horizons.
+
+EXAMPLE from the Supporting Guide (expected format):
+- Topic: Climate Change | Type: Practice | Description: "Fleet replacement with electric vehicles (40% completed by Dec. 2024)" | Monitoring indicator: % electrified fleet | Target: 100% by 2027
+
+Using this format as reference, develop the C2 disclosure for company [NAME] on the identified material topics: [LIST OF MATERIAL ANNEX B TOPICS].
+
+For each material topic generate at least:
+- 1 practice already implemented (with verifiable evidence)
+- 1 formal policy (or indicate if pending formalization)
+- 1 future initiative with concrete time horizon and monitoring KPI
+
+Order by potential impact on sustainable transition. Flag whether information aligns with GHG Protocol for emissions-related topics.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME C3</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Objetivos de Reducción de GEI y Plan de Transición Climática (C3)</div>
+        <div class="card-title-en">GHG Reduction Targets & Climate Transition Plan (C3)</div>
+        <div class="card-use">Técnica Chain-of-Thought. Desarrolla la divulgación C3 del VSME siguiendo el Supporting Guide oficial de EFRAG sobre objetivos de reducción de emisiones y planes de transición climática para PYMEs.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Chain-of-Thought (Supporting Guide EFRAG C3)</div>
+          <div class="prompt-text">Actúa como experto en el Supporting Guide de EFRAG para la divulgación C3 del VSME (objetivos de reducción de GEI y planes de transición climática para PYMEs). Datos de la empresa: [NOMBRE], sector [SECTOR], emisiones actuales Scope 1: [X tCO2e], Scope 2: [Y tCO2e], Scope 3 relevante: [Z tCO2e o "no calculado aún"].
+
+Razona paso a paso:
+
+PASO 1 — LÍNEA BASE: ¿Los datos de emisiones actuales son suficientes para establecer una línea base? Identifica qué falta si los Scope 3 no están calculados.
+
+PASO 2 — ESCENARIO DE REFERENCIA: Para una PYME de este sector, ¿qué escenario de temperatura (1.5°C / 2°C / sector-específico) es más apropiado como referencia? Justifica.
+
+PASO 3 — OBJETIVO: Propone un objetivo de reducción SMART: porcentaje de reducción, alcance (S1/S2/S3), año base, año meta. Verifica que sea ambicioso pero alcanzable para una PYME.
+
+PASO 4 — PALANCAS: Lista las 5 principales acciones de reducción ordenadas por: potencial de reducción (tCO2e) / coste estimado de implementación / plazo de implementación.
+
+PASO 5 — DIVULGACIÓN C3: Redacta el texto de divulgación C3 siguiendo la estructura del Supporting Guide de EFRAG, señalando con [VERIFICAR] cualquier dato que requiera validación externa.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Chain-of-Thought (EFRAG C3 Supporting Guide)</div>
+          <div class="prompt-text en">Act as an expert in EFRAG's Supporting Guide for VSME C3 disclosure (GHG reduction targets and climate transition plans for SMEs). Company data: [NAME], sector [SECTOR], current emissions Scope 1: [X tCO2e], Scope 2: [Y tCO2e], relevant Scope 3: [Z tCO2e or "not yet calculated"].
+
+Reason step by step:
+
+STEP 1 — BASELINE: Are current emission data sufficient to establish a baseline? Identify what is missing if Scope 3 is not calculated.
+
+STEP 2 — REFERENCE SCENARIO: For an SME in this sector, which temperature scenario (1.5°C / 2°C / sector-specific) is most appropriate as reference? Justify.
+
+STEP 3 — TARGET: Propose a SMART reduction target: reduction percentage, scope (S1/S2/S3), base year, target year. Verify it is ambitious but achievable for an SME.
+
+STEP 4 — LEVERS: List the 5 main reduction actions ranked by: reduction potential (tCO2e) / estimated implementation cost / implementation timeline.
+
+STEP 5 — C3 DISCLOSURE: Draft the C3 disclosure text following EFRAG Supporting Guide structure, flagging with [VERIFY] any data requiring external validation.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme" style="--i:3">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME XBRL</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Preparación para el Digital Template XBRL (v1.1.1)</div>
+        <div class="card-title-en">XBRL Digital Template Preparation (v1.1.1)</div>
+        <div class="card-use">Técnica Role + Iterative. Prepara los datos de la empresa para el VSME Digital Template XBRL v1.1.1 de EFRAG (febrero 2026), identificando datapoints por módulo, condición y tipo de dato requerido.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Role + Iterative Prompting (EFRAG XBRL Template v1.1.1)</div>
+          <div class="prompt-text">Actúa como especialista en el VSME Digital Template XBRL de EFRAG (versión 1.1.1, publicada noviembre 2025 / taxonomía actualizada febrero 2026). Este template digital tiene validaciones automáticas, checkboxes interactivos y codificación por colores para datapoints del Módulo Básico (B) y Comprensivo (C).
+
+La empresa es [NOMBRE], sector [SECTOR], [X] empleados (indicar si es micro: <10, pequeña: 10-49, mediana: 50-249).
+
+ITERACIÓN 1 — ELEGIBILIDAD: ¿Qué secciones del Digital Template aplican a esta empresa según su tamaño? Indica cuáles son obligatorias, cuáles son "if applicable" y cuáles son voluntarias del Módulo Comprensivo.
+
+ITERACIÓN 2 — INVENTARIO DE DATOS: Para los datapoints obligatorios del Módulo B, clasifica cada uno como: (a) Dato disponible en la empresa, (b) Dato parcialmente disponible, (c) Dato no disponible — requiere recopilación. Presenta en tabla: Datapoint | Código VSME | Tipo dato (numérico/texto/S-N) | Estado.
+
+ITERACIÓN 3 — GAPS CRÍTICOS: Identifica los 5 datapoints con mayor riesgo de quedar incompletos en el template y propón la fuente interna más probable para obtenerlos (RRHH, Compras, Operaciones, Dirección).
+
+ITERACIÓN 4 — PLAN DE ACCIÓN: Cronograma de recopilación de datos en 8 semanas para completar el Digital Template.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Role + Iterative Prompting (EFRAG XBRL Template v1.1.1)</div>
+          <div class="prompt-text en">Act as a specialist in EFRAG's VSME Digital Template XBRL (version 1.1.1, published November 2025 / taxonomy updated February 2026). This digital template has automatic validations, interactive checkboxes and color-coding for Basic Module (B) and Comprehensive Module (C) datapoints.
+
+Company: [NAME], sector [SECTOR], [X] employees (indicate if micro: <10, small: 10-49, medium: 50-249).
+
+ITERATION 1 — ELIGIBILITY: Which Digital Template sections apply to this company by size? Indicate which are mandatory, which are "if applicable" and which are voluntary Comprehensive Module items.
+
+ITERATION 2 — DATA INVENTORY: For mandatory Module B datapoints, classify each as: (a) Data available in company, (b) Data partially available, (c) Data unavailable — requires collection. Present as table: Datapoint | VSME Code | Data type (numeric/text/Y-N) | Status.
+
+ITERATION 3 — CRITICAL GAPS: Identify the 5 datapoints most at risk of being incomplete in the template and propose the most likely internal source (HR, Procurement, Operations, Management).
+
+ITERATION 4 — ACTION PLAN: 8-week data collection schedule to complete the Digital Template.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme" style="--i:4">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Derechos Humanos en la Cadena de Valor (C7)</div>
+        <div class="card-title-en">Human Rights in the Value Chain (C7)</div>
+        <div class="card-use">Técnica Persona-based del AI Playbook de Google + RACE. Desarrolla la divulgación C7 del VSME sobre incidentes graves de derechos humanos en la cadena de valor, usando los casos del Supporting Guide oficial de EFRAG.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Persona-based (Google AI Playbook) + RACE</div>
+          <div class="prompt-text">ROL: Actúa como auditor de derechos humanos con expertise en el Supporting Guide de EFRAG sobre la divulgación C7 del VSME (incidentes graves de derechos humanos en la cadena de valor).
+
+ACCIÓN: Evalúa la exposición a riesgos de derechos humanos en la cadena de valor de la empresa y prepara la divulgación C7.
+
+CONTEXTO: Empresa [NOMBRE], sector [SECTOR], proveedores en [PAÍSES/REGIONES]. Categorías de compra principales: [LISTA]. El Supporting Guide de EFRAG para C7 identifica tres tipos de incidentes graves: trabajo forzado, trabajo infantil, y condiciones de trabajo inseguras/salarios por debajo del mínimo.
+
+EXPECTATIVA — razona como si fueras también el auditor escéptico del AI Playbook de Google:
+1. Mapa de riesgo de derechos humanos por categoría de proveedor y geografía (Alto/Medio/Bajo)
+2. ¿Tiene la empresa un proceso de due diligence de proveedores? ¿Es suficiente para la divulgación C7?
+3. ¿Existe un canal formal de denuncia accesible para trabajadores de la cadena de valor?
+4. Redacta el texto de divulgación C7 para los incidentes del período [AÑO] o, si no hay incidentes, la declaración de diligencia debida aplicada
+5. Preguntas difíciles que una ONG o auditor haría sobre esta divulgación</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Persona-based (Google AI Playbook) + RACE</div>
+          <div class="prompt-text en">ROLE: Act as a human rights auditor with expertise in EFRAG's Supporting Guide on VSME C7 disclosure (severe human rights incidents in the value chain).
+
+ACTION: Assess human rights risk exposure in the company's value chain and prepare the C7 disclosure.
+
+CONTEXT: Company [NAME], sector [SECTOR], suppliers in [COUNTRIES/REGIONS]. Main procurement categories: [LIST]. EFRAG's C7 Supporting Guide identifies three types of severe incidents: forced labor, child labor, and unsafe working conditions/below-minimum wages.
+
+EXPECTATION — reason as both auditor and the skeptical journalist from the Google AI Playbook:
+1. Human rights risk map by supplier category and geography (High/Medium/Low)
+2. Does the company have a supplier due diligence process? Is it sufficient for C7 disclosure?
+3. Is there a formal grievance channel accessible to value chain workers?
+4. Draft the C7 disclosure text for incidents in period [YEAR] or, if no incidents, the due diligence statement applied
+5. Tough questions an NGO or auditor would ask about this disclosure</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="vsme csrd" style="--i:5">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-vsme">VSME Omnibus</span><span class="tag tag-csrd">Omnibus 2025</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">VSME y el Paquete Omnibus 2025: Impacto en PYMEs</div>
+        <div class="card-title-en">VSME & Omnibus Package 2025: SME Impact Analysis</div>
+        <div class="card-use">Técnica CoT + Grounding. Analiza el impacto del Paquete Omnibus I (febrero 2025) y la Recomendación VSME de la Comisión Europea (julio 2025) en la estrategia de reporte de sostenibilidad de una PYME.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Chain-of-Thought + Grounding en documentación oficial</div>
+          <div class="prompt-text">Actúa como consultor normativo ESG especializado en el impacto del Paquete Omnibus I de la Comisión Europea (26 febrero 2025) y la Recomendación VSME (30 julio 2025) sobre las obligaciones de reporte de sostenibilidad de las PYMEs europeas.
+
+Usando ÚNICAMENTE la siguiente información oficial verificada:
+- Omnibus I: propone reducir el CSRD a empresas con más de 1.000 empleados
+- VSME Recomendación CE: adoptada el 30 julio 2025 para empresas con menos de 250 empleados
+- El VSME se prevé como base de un acto delegado voluntario para empresas de 250-1.000 empleados
+
+PARA LA EMPRESA [NOMBRE] con [X] empleados, razona paso a paso:
+
+PASO 1 — SITUACIÓN ACTUAL: ¿Está esta empresa actualmente sujeta a CSRD? ¿Cambia algo con el Omnibus?
+PASO 2 — ESCENARIO VSME: ¿Qué versión del VSME le aplica (Recomendación actual / futuro acto delegado)?
+PASO 3 — PRESIÓN DE CADENA DE VALOR: ¿Sus clientes grandes siguen sujetos a CSRD y pueden solicitarle datos? ¿Qué límite establece el "value chain cap" del Omnibus?
+PASO 4 — RECOMENDACIÓN ESTRATÉGICA: ¿Debe esta empresa reportar VSME ahora voluntariamente o esperar? Argumenta pros y contras con horizonte 2025-2027.
+PASO 5 — PLAN DE ACCIÓN: Próximos 3 pasos concretos con responsable y fecha.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Chain-of-Thought + Grounding in official documentation</div>
+          <div class="prompt-text en">Act as an ESG regulatory consultant specializing in the impact of the European Commission's Omnibus I Package (26 February 2025) and the VSME Recommendation (30 July 2025) on European SME sustainability reporting obligations.
+
+Using ONLY the following verified official information:
+- Omnibus I: proposes reducing CSRD scope to companies with more than 1,000 employees
+- VSME EC Recommendation: adopted 30 July 2025 for companies with fewer than 250 employees
+- VSME is planned as the basis for a voluntary delegated act for companies with 250–1,000 employees
+
+FOR COMPANY [NAME] with [X] employees, reason step by step:
+
+STEP 1 — CURRENT SITUATION: Is this company currently subject to CSRD? Does anything change with Omnibus?
+STEP 2 — VSME SCENARIO: Which VSME version applies (current Recommendation / future delegated act)?
+STEP 3 — VALUE CHAIN PRESSURE: Do their large clients remain CSRD-subject and can they request data? What limit does the Omnibus "value chain cap" establish?
+STEP 4 — STRATEGIC RECOMMENDATION: Should this company report VSME voluntarily now or wait? Argue pros and cons with 2025–2027 horizon.
+STEP 5 — ACTION PLAN: Next 3 concrete steps with owner and date.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 9: ISO 14001:2026 — TRANSICIÓN Y NUEVOS REQUISITOS -->
+  <div class="section" id="sec-iso2026">
+    <div class="section-header">
+      <h2 class="section-title">ISO 14001:2026 · Transición</h2>
+      <span class="section-count">ISO 14001:2026 · FDIS · Abril 2026</span>
+    </div>
+    <p class="section-desc">Prompts basados en el FDIS de ISO 14001:2026 (aprobado por miembros ISO, publicación prevista abril 2026). Cubren los cambios clave: nueva Cláusula 6.3, énfasis en biodiversidad, perspectiva de ciclo de vida y gestión de proveedores externos. Técnicas: RACE, CoT, Iterative y Mock Scoring.</p>
+    <div class="prompt-grid">
+
+      <div class="prompt-card" data-tags="iso" style="--i:0">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001:2026</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Análisis de Brechas ISO 14001:2015 → 2026</div>
+        <div class="card-title-en">Gap Analysis ISO 14001:2015 → 2026</div>
+        <div class="card-use">Técnica RACE + Mock Scoring. Identifica las brechas entre el SGA certificado en ISO 14001:2015 y los nuevos requisitos del FDIS ISO 14001:2026, priorizando acciones de transición antes de mayo 2029.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: RACE + Mock Scoring (ISO 14001:2026 FDIS)</div>
+          <div class="prompt-text">ROL: Actúa como auditor líder de ISO 14001 especializado en la transición al FDIS ISO 14001:2026 (publicación prevista abril 2026, período de transición 3 años hasta ~mayo 2029).
+
+ACCIÓN: Realiza un análisis de brechas entre el SGA actual de la empresa y los nuevos/modificados requisitos del FDIS 14001:2026.
+
+CONTEXTO: La organización [NOMBRE] está certificada en ISO 14001:2015 desde [AÑO]. Sector: [SECTOR]. Descripción breve del SGA actual: [DESCRIBIR O ADJUNTAR ALCANCE].
+
+Los cambios clave del FDIS 14001:2026 son:
+- Cláusula 4.1/4.2: mayor énfasis en contaminación, biodiversidad y disponibilidad de recursos naturales (además de clima)
+- Nueva Cláusula 6.3: requisitos estructurados de gestión del cambio
+- Cláusula 6.1: riesgos y oportunidades reposicionados más tarde en la planificación
+- Cláusula 8: "procesos externos provistos" reemplaza "procesos subcontratados"
+- Perspectiva de ciclo de vida: reforzada en el proceso de aspectos ambientales
+
+EXPECTATIVA: Para cada cambio clave, evalúa (simulando una puntuación de auditoría pre-transición):
+Cláusula | Requisito 2026 | Estado actual (Conforme/Parcial/Brecha) | Evidencia disponible | Acción de transición | Prioridad (A/M/B) | Plazo recomendado</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: RACE + Mock Scoring (ISO 14001:2026 FDIS)</div>
+          <div class="prompt-text en">ROLE: Act as an ISO 14001 lead auditor specializing in transition to ISO 14001:2026 FDIS (publication expected April 2026, 3-year transition period until ~May 2029).
+
+ACTION: Conduct a gap analysis between the company's current EMS and the new/modified requirements of ISO 14001:2026 FDIS.
+
+CONTEXT: Organization [NAME] has been certified to ISO 14001:2015 since [YEAR]. Sector: [SECTOR]. Brief description of current EMS: [DESCRIBE OR ATTACH SCOPE].
+
+Key changes in ISO 14001:2026 FDIS:
+- Clause 4.1/4.2: stronger emphasis on pollution, biodiversity and natural resource availability (in addition to climate)
+- New Clause 6.3: structured change management requirements
+- Clause 6.1: risks and opportunities repositioned later in the planning process
+- Clause 8: "externally provided processes, products and services" replaces "outsourced processes"
+- Life cycle perspective: reinforced in the environmental aspects process
+
+EXPECTATION: For each key change, assess (simulating a pre-transition audit score):
+Clause | 2026 Requirement | Current status (Conform/Partial/Gap) | Available evidence | Transition action | Priority (H/M/L) | Recommended timeline</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso" style="--i:1">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001:2026</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Nueva Cláusula 6.3: Gestión del Cambio Ambiental</div>
+        <div class="card-title-en">New Clause 6.3: Environmental Change Management</div>
+        <div class="card-use">Técnica Chain-of-Thought. Implementa los requisitos de la nueva Cláusula 6.3 del FDIS ISO 14001:2026, que exige un proceso formal de evaluación del impacto ambiental de los cambios organizativos antes de implementarlos.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Chain-of-Thought (ISO 14001:2026 Cláusula 6.3)</div>
+          <div class="prompt-text">Actúa como consultor de SGA especializado en la nueva Cláusula 6.3 del FDIS ISO 14001:2026 (Planificación de cambios). Esta cláusula exige que la organización planifique de forma sistemática los cambios que puedan afectar a su SGA, evaluando sus consecuencias ambientales antes de implementarlos.
+
+La organización [NOMBRE] está planificando el siguiente cambio: [DESCRIBIR EL CAMBIO: ejemplo: apertura de nueva instalación / cambio de proveedor de materia prima / introducción de nuevo proceso productivo / deslocalización de producción].
+
+Razona paso a paso para diseñar el proceso de gestión del cambio conforme a la Cláusula 6.3:
+
+PASO 1 — IDENTIFICACIÓN: ¿Qué aspectos ambientales nuevos o modificados genera este cambio? ¿Cuáles podrían volverse significativos?
+PASO 2 — EVALUACIÓN: ¿Cómo cambia la significancia de los aspectos existentes? ¿Se activan nuevos requisitos legales?
+PASO 3 — RIESGOS Y OPORTUNIDADES: ¿Qué nuevos riesgos ambientales introduce el cambio? ¿Qué oportunidades de mejora ambiental ofrece?
+PASO 4 — CONTROLES: ¿Qué controles operacionales nuevos o modificados son necesarios antes de implementar el cambio?
+PASO 5 — DOCUMENTACIÓN: Lista los documentos del SGA que deben actualizarse como resultado de este cambio.
+PASO 6 — APROBACIÓN: Redacta el registro de aprobación del cambio (change record) con todos los campos requeridos por la Cláusula 6.3.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Chain-of-Thought (ISO 14001:2026 Clause 6.3)</div>
+          <div class="prompt-text en">Act as an EMS consultant specializing in the new Clause 6.3 of ISO 14001:2026 FDIS (Planning of changes). This clause requires organizations to systematically plan changes that may affect their EMS, assessing environmental consequences before implementation.
+
+Organization [NAME] is planning the following change: [DESCRIBE THE CHANGE: e.g. new facility opening / raw material supplier change / new production process / production relocation].
+
+Reason step by step to design the change management process per Clause 6.3:
+
+STEP 1 — IDENTIFICATION: What new or modified environmental aspects does this change generate? Which could become significant?
+STEP 2 — EVALUATION: How does the significance of existing aspects change? Are new legal requirements triggered?
+STEP 3 — RISKS AND OPPORTUNITIES: What new environmental risks does the change introduce? What environmental improvement opportunities does it offer?
+STEP 4 — CONTROLS: What new or modified operational controls are needed before implementing the change?
+STEP 5 — DOCUMENTATION: List EMS documents that must be updated as a result of this change.
+STEP 6 — APPROVAL: Draft the change approval record with all fields required by Clause 6.3.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso" style="--i:2">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001:2026</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Biodiversidad y Recursos Naturales en el Contexto del SGA (Cláusula 4)</div>
+        <div class="card-title-en">Biodiversity & Natural Resources in EMS Context (Clause 4)</div>
+        <div class="card-use">Técnica Iterativa. Integra los nuevos énfasis del FDIS ISO 14001:2026 en biodiversidad, disponibilidad de recursos naturales y niveles de contaminación en el análisis del contexto organizacional (Cláusulas 4.1 y 4.2).</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Iterative Prompting (ISO 14001:2026 Cláusulas 4.1/4.2)</div>
+          <div class="prompt-text">Actúa como auditor ambiental experto en los cambios de las Cláusulas 4.1 y 4.2 del FDIS ISO 14001:2026. A diferencia de la versión 2015, el FDIS 2026 exige explícitamente que el análisis del contexto organizacional considere: niveles de contaminación locales, biodiversidad y ecosistemas en la zona de influencia, y disponibilidad de recursos naturales críticos (agua, materias primas, energía).
+
+La organización [NOMBRE] opera en [UBICACIÓN/ES]. Sector: [SECTOR].
+
+ITERACIÓN 1 — CONDICIONES AMBIENTALES LOCALES: Analiza las condiciones ambientales externas que afectan o pueden afectar a la organización en su ubicación: niveles de contaminación del aire/agua/suelo conocidos, estado de biodiversidad local (¿hay especies amenazadas o hábitats protegidos cercanos?), estrés hídrico de la zona, disponibilidad de recursos naturales críticos para el proceso productivo.
+
+ITERACIÓN 2 — PARTES INTERESADAS AMPLIADAS (4.2): ¿Qué nuevas partes interesadas emergen de estos factores de biodiversidad y recursos? (autoridades locales, comunidades, ONGs ambientales, organismos de cuenca hidrográfica).
+
+ITERACIÓN 3 — ACTUALIZACIÓN DEL REGISTRO DE CONTEXTO: Redacta el texto actualizado para el registro de contexto organizacional (4.1) y el análisis de partes interesadas (4.2) incorporando los nuevos énfasis del FDIS 2026.
+
+ITERACIÓN 4 — CHECKLIST DE AUDITORÍA: Genera las preguntas que un auditor de certificación haría en la auditoría de transición sobre estos apartados.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Iterative Prompting (ISO 14001:2026 Clauses 4.1/4.2)</div>
+          <div class="prompt-text en">Act as an environmental auditor expert in the changes to Clauses 4.1 and 4.2 of ISO 14001:2026 FDIS. Unlike the 2015 version, the 2026 FDIS explicitly requires the organizational context analysis to consider: local pollution levels, biodiversity and ecosystems in the area of influence, and availability of critical natural resources (water, raw materials, energy).
+
+Organization [NAME] operates in [LOCATION/S]. Sector: [SECTOR].
+
+ITERATION 1 — LOCAL ENVIRONMENTAL CONDITIONS: Analyze external environmental conditions affecting or likely to affect the organization at its location: known air/water/soil pollution levels, local biodiversity status (nearby threatened species or protected habitats?), area water stress, availability of critical natural resources for the production process.
+
+ITERATION 2 — EXPANDED INTERESTED PARTIES (4.2): What new interested parties emerge from these biodiversity and resource factors? (local authorities, communities, environmental NGOs, river basin authorities).
+
+ITERATION 3 — CONTEXT REGISTER UPDATE: Draft the updated text for the organizational context register (4.1) and interested party analysis (4.2) incorporating the new 2026 FDIS emphases.
+
+ITERATION 4 — AUDIT CHECKLIST: Generate the questions a certification auditor would ask in the transition audit on these sections.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso" style="--i:3">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001:2026</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Perspectiva de Ciclo de Vida Reforzada (Cláusula 6.1.2)</div>
+        <div class="card-title-en">Strengthened Life Cycle Perspective (Clause 6.1.2)</div>
+        <div class="card-use">Técnica Few-Shot. Aplica la perspectiva de ciclo de vida reforzada en el FDIS ISO 14001:2026 al proceso de identificación de aspectos ambientales, incluyendo impactos upstream (proveedores) y downstream (uso y fin de vida del producto).</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Few-Shot (ISO 14001:2026 Cláusula 6.1.2 · Ciclo de Vida)</div>
+          <div class="prompt-text">Actúa como experto en análisis de ciclo de vida (ACV simplificado) y su aplicación en la Cláusula 6.1.2 del FDIS ISO 14001:2026. El FDIS 2026 refuerza que la identificación de aspectos ambientales debe considerar explícitamente la perspectiva de ciclo de vida completo: desde la extracción de materias primas hasta el fin de vida del producto/servicio.
+
+EJEMPLO (Few-Shot) para una empresa de fabricación de envases plásticos:
+- Upstream: extracción de petróleo (aspecto: consumo de recursos no renovables, impacto: agotamiento de recursos), transporte de resinas (aspecto: emisiones de transporte, impacto: cambio climático)
+- Operaciones propias: proceso de inyección (aspecto: consumo energético, impacto: cambio climático; aspecto: generación de recortes plásticos, impacto: residuos)
+- Downstream: uso por cliente (aspecto: durabilidad del envase, impacto positivo: extensión de vida útil de alimentos), fin de vida (aspecto: reciclabilidad del material, impacto: residuos/economía circular)
+
+Usando este formato, aplica la perspectiva de ciclo de vida a [NOMBRE DE EMPRESA], sector [SECTOR], producto/servicio principal: [DESCRIBIR]. Para cada etapa del ciclo de vida: Etapa | Aspecto ambiental | Impacto ambiental | Significativo (S/N) | Control posible | ¿Nuevo respecto a 2015?</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Few-Shot (ISO 14001:2026 Clause 6.1.2 · Life Cycle)</div>
+          <div class="prompt-text en">Act as an expert in life cycle assessment (simplified LCA) and its application in Clause 6.1.2 of ISO 14001:2026 FDIS. The 2026 FDIS reinforces that environmental aspect identification must explicitly consider a full life cycle perspective: from raw material extraction to end-of-life of the product/service.
+
+EXAMPLE (Few-Shot) for a plastic packaging manufacturer:
+- Upstream: petroleum extraction (aspect: non-renewable resource consumption, impact: resource depletion), resin transport (aspect: transport emissions, impact: climate change)
+- Own operations: injection process (aspect: energy consumption, impact: climate change; aspect: plastic scrap generation, impact: waste)
+- Downstream: customer use (aspect: packaging durability, positive impact: food shelf-life extension), end of life (aspect: material recyclability, impact: waste/circular economy)
+
+Using this format, apply the life cycle perspective to [COMPANY NAME], sector [SECTOR], main product/service: [DESCRIBE]. For each life cycle stage: Stage | Environmental aspect | Environmental impact | Significant (Y/N) | Possible control | New vs. 2015?</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso" style="--i:4">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001:2026</span></div>
+          <span class="difficulty diff-advanced">Avanzado</span>
+        </div>
+        <div class="card-title">Procesos Provistos Externamente (Cláusula 8 Revisada)</div>
+        <div class="card-title-en">Externally Provided Processes (Revised Clause 8)</div>
+        <div class="card-use">Técnica RACE. Implementa el alcance ampliado de la Cláusula 8 del FDIS ISO 14001:2026, que extiende el control operacional de "procesos subcontratados" a todos los "procesos, productos y servicios provistos externamente" con impacto ambiental significativo.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: RACE (ISO 14001:2026 Cláusula 8 revisada)</div>
+          <div class="prompt-text">ROL: Actúa como responsable de compras sostenibles y SGA con conocimiento del cambio de "procesos subcontratados" a "procesos, productos y servicios provistos externamente" en el FDIS ISO 14001:2026 (Cláusula 8).
+
+ACCIÓN: Identifica qué proveedores y procesos externos de la organización ahora quedan bajo el alcance de control operacional del SGA según el FDIS 2026, y diseña los controles necesarios.
+
+CONTEXTO: La organización [NOMBRE] actualmente controla ambientalmente estos procesos subcontratados: [LISTA]. Sus principales proveedores externos son: [LISTA con tipo de producto/servicio]. Aspectos ambientales significativos relacionados con la cadena de suministro: [O INDICA "pendiente de revisar"].
+
+EXPECTATIVA:
+1. ¿Qué proveedores/procesos que antes quedaban fuera del SGA ahora deben incluirse bajo el FDIS 2026?
+2. Para cada nuevo proceso externo relevante: tipo de control recomendado (requisitos contractuales / auditoría / cuestionario ESG / certificación exigida)
+3. Actualización de la matriz de aspectos ambientales para incluir los nuevos procesos externos
+4. Cláusulas ambientales mínimas recomendadas para incluir en contratos con proveedores
+5. Plan de implementación en 6 meses para el nuevo alcance de la Cláusula 8</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: RACE (ISO 14001:2026 Revised Clause 8)</div>
+          <div class="prompt-text en">ROLE: Act as a sustainable procurement and EMS manager with knowledge of the shift from "outsourced processes" to "externally provided processes, products and services" in ISO 14001:2026 FDIS (Clause 8).
+
+ACTION: Identify which external suppliers and processes of the organization now fall under EMS operational control per FDIS 2026, and design the necessary controls.
+
+CONTEXT: Organization [NAME] currently environmentally controls these outsourced processes: [LIST]. Main external suppliers: [LIST with product/service type]. Significant environmental aspects related to supply chain: [OR INDICATE "pending review"].
+
+EXPECTATION:
+1. Which suppliers/processes previously outside the EMS scope now must be included under FDIS 2026?
+2. For each relevant new external process: recommended control type (contractual requirements / audit / ESG questionnaire / required certification)
+3. Environmental aspects matrix update to include new external processes
+4. Minimum environmental clauses recommended for inclusion in supplier contracts
+5. 6-month implementation plan for the new Clause 8 scope</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-tags="iso" style="--i:5">
+        <div class="card-top">
+          <div class="card-tags"><span class="tag tag-iso">ISO 14001:2026</span></div>
+          <span class="difficulty diff-expert">Experto</span>
+        </div>
+        <div class="card-title">Plan de Transición Completo a ISO 14001:2026</div>
+        <div class="card-title-en">Full Transition Plan to ISO 14001:2026</div>
+        <div class="card-use">Técnica Iterative + Reactive Communications (Google AI Playbook). Diseña el plan de transición completo de ISO 14001:2015 a ISO 14001:2026, con hoja de ruta hasta mayo 2029 y preparación para la auditoría de transición.</div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt ES · Técnica: Iterative + Reactive Comms (Google AI Playbook)</div>
+          <div class="prompt-text">Actúa como consultor de gestión ambiental especializado en la transición a ISO 14001:2026 (publicación prevista abril 2026, período de transición 3 años hasta ~mayo 2029 según borrador IAF).
+
+La organización [NOMBRE] está certificada desde [AÑO] por [ENTIDAD CERTIFICADORA]. Próxima auditoría de vigilancia/recertificación: [FECHA].
+
+ITERACIÓN 1 — ANÁLISIS DE IMPACTO: Para esta organización específica, ¿cuáles de los cambios del FDIS 2026 tienen mayor impacto? (considera tamaño, sector, complejidad del SGA actual).
+
+ITERACIÓN 2 — HOJA DE RUTA: Diseña un plan de transición en 4 fases:
+- Fase 1 (meses 1-3): Familiarización y análisis de brechas
+- Fase 2 (meses 4-9): Actualización de documentación y procesos
+- Fase 3 (meses 10-18): Implementación, formación y auditoría interna
+- Fase 4 (meses 19-36): Auditoría de transición con entidad certificadora
+
+ITERACIÓN 3 — PREPARACIÓN PARA LA AUDITORÍA: Genera el briefing de preparación para la auditoría de transición con los puntos que el auditor verificará sobre los nuevos requisitos del FDIS 2026.
+
+ITERACIÓN 4 — COMUNICACIÓN INTERNA: Redacta el comunicado interno para informar a los empleados y directivos sobre la transición y sus implicaciones prácticas en el día a día.</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Prompt EN · Technique: Iterative + Reactive Comms (Google AI Playbook)</div>
+          <div class="prompt-text en">Act as an environmental management consultant specializing in transition to ISO 14001:2026 (publication expected April 2026, 3-year transition period until ~May 2029 per IAF draft).
+
+Organization [NAME] has been certified since [YEAR] by [CERTIFICATION BODY]. Next surveillance/recertification audit: [DATE].
+
+ITERATION 1 — IMPACT ANALYSIS: For this specific organization, which FDIS 2026 changes have the greatest impact? (consider size, sector, current EMS complexity).
+
+ITERATION 2 — ROADMAP: Design a transition plan in 4 phases:
+- Phase 1 (months 1-3): Familiarization and gap analysis
+- Phase 2 (months 4-9): Documentation and process update
+- Phase 3 (months 10-18): Implementation, training and internal audit
+- Phase 4 (months 19-36): Transition audit with certification body
+
+ITERATION 3 — AUDIT PREPARATION: Generate the preparation briefing for the transition audit with the points the auditor will verify on the new FDIS 2026 requirements.
+
+ITERATION 4 — INTERNAL COMMUNICATION: Draft the internal communication to inform employees and managers about the transition and its practical day-to-day implications.</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="es" onclick="copyPrompt(this)">Copiar ES</button>
+          <button class="copy-btn" data-copy="en" onclick="copyPrompt(this)">Copy EN</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="emptyState">
+    <p>No se encontraron prompts · No prompts found</p>
+    <p style="margin-top:8px;font-size:11px;">Intenta con otro término de búsqueda · Try a different search term</p>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-name">Pablo Isaac López Vaca</div>
+  <div class="footer-meta">Environmental Management · ESG Compliance · Applied AI · Bizkaia, Euskadi</div>
+  <div class="footer-links">
+    <a href="https://www.linkedin.com/in/pablolopezvaca/" target="_blank">LinkedIn</a>
+    <a href="https://github.com/Pablolopezvaca" target="_blank">GitHub</a>
+    <!-- <a href="/cdn-cgi/l/email-protection#116170737d7e78627070723f7d7e61746b6770727051767c70787d3f727e7c">Contacto</a> -->
+    <a href="#" onclick="var u='pabloisaac.lopezvaca'; var d='gmail.com'; window.location.href='mailto:'+u+'@'+d; return false;">Contacto</a>
+  </div>
+</footer>
+
+<!-- <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>-->
+<script> 
+  // DATA - queried at runtime inside init for accuracy
+  let allCards;
+  const searchInput = document.getElementById('searchInput');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const langBtns = document.querySelectorAll('.lang-btn');
+  const visibleCount = document.getElementById('visibleCount');
+  const emptyState = document.getElementById('emptyState');
+
+  let currentFilter = 'all';
+  let currentLang = 'es';
+  let currentSearch = '';
+
+  function updateVisible() {
+    let count = 0;
+    allCards.forEach(card => {
+      const tags = card.dataset.tags || '';
+      // Get searchable text only from title and use fields, not prompt boxes (avoids EN text being hidden)
+      const titleText = (card.querySelector('.card-title') || {}).textContent || '';
+      const useText = (card.querySelector('.card-use') || {}).textContent || '';
+      const tagText = tags;
+      const searchableText = (titleText + ' ' + useText + ' ' + tagText).toLowerCase();
+
+      const matchesFilter = currentFilter === 'all' || tags.split(' ').includes(currentFilter);
+      const matchesSearch = currentSearch === '' || searchableText.includes(currentSearch.toLowerCase());
+
+      if (matchesFilter && matchesSearch) {
+        card.classList.remove('hidden');
+        count++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+    visibleCount.textContent = count;
+    emptyState.style.display = count === 0 ? 'block' : 'none';
+
+    document.querySelectorAll('.section').forEach(sec => {
+      const visible = sec.querySelectorAll('.prompt-card:not(.hidden)').length;
+      sec.style.display = visible === 0 ? 'none' : '';
+    });
+  }
+
+  function updateLang() {
+    allCards.forEach(card => {
+      const esBox = card.querySelectorAll('.prompt-box')[0];
+      const enBox = card.querySelectorAll('.prompt-box')[1];
+      const esBtn = card.querySelectorAll('.copy-btn')[0];
+      const enBtn = card.querySelectorAll('.copy-btn')[1];
+      if (!esBox || !enBox) return;
+      if (currentLang === 'es') {
+        esBox.style.display = ''; enBox.style.display = 'none';
+        if (esBtn) esBtn.style.display = ''; if (enBtn) enBtn.style.display = 'none';
+      } else if (currentLang === 'en') {
+        esBox.style.display = 'none'; enBox.style.display = '';
+        if (esBtn) esBtn.style.display = 'none'; if (enBtn) enBtn.style.display = '';
+      } else {
+        esBox.style.display = ''; enBox.style.display = '';
+        if (esBtn) esBtn.style.display = ''; if (enBtn) enBtn.style.display = '';
+      }
+    });
+  }
+
+  searchInput.addEventListener('input', e => {
+    currentSearch = e.target.value;
+    updateVisible();
+  });
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      updateVisible();
+    });
+  });
+
+  langBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      langBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLang = btn.dataset.lang;
+      updateLang();
+    });
+  });
+
+  function copyPrompt(btn) {
+    const card = btn.closest('.prompt-card');
+    const lang = btn.dataset.copy;
+    const boxes = card.querySelectorAll('.prompt-box');
+    let target;
+    if (lang === 'es') target = boxes[0];
+    else if (lang === 'en') target = boxes[1];
+    if (!target) return;
+    const text = target.querySelector('.prompt-text').textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error('Error al copiar:', err);
+    });
+  }
+
+  // INIT — wait for full DOM
+  function init() {
+    allCards = document.querySelectorAll('.prompt-card');
+    const total = allCards.length;
+    document.getElementById('totalCount').textContent = total;
+    updateLang();
+    updateVisible();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // INICIALIZACIÓN: Forzar el estado visual inicial correcto al cargar la página
+  updateLang();
+  updateVisible();
+
+</script>
+</body>
+</html>
