@@ -3,7 +3,7 @@
 **42 prompts técnicos bilingües (ES/EN) para profesionales de sostenibilidad que trabajan con IA.**  
 *42 bilingual technical prompts (ES/EN) for sustainability professionals working with AI.*
 
-🌐 **[Ver la biblioteca en vivo · Live library → TU URL DE GITHUB PAGES AQUÍ]**
+🌐 **[Ver la biblioteca en vivo · Live library → https://pablolopezvaca.github.io/esg-prompt-library/]**
 
 ---
 
