@@ -146,7 +146,7 @@ Si esta biblioteca le ayuda a un equipo interno a prepararse mejor para una audi
 
 Soy **Pablo Isaac López Vaca**, técnico en gestión ambiental y especialista en cumplimiento normativo ESG, radicado en Bizkaia (Euskadi). Vengo del derecho ambiental y la gestión pública en Ecuador, y me he recualificado en Euskadi con foco en la normativa ambiental europea, análisis de datos y aplicación práctica de IA en sostenibilidad.
 
-Este proyecto forma parte de mi trabajo para posicionarme en la intersección entre **cumplimiento normativo ESG** y **herramientas de IA aplicadas** — especialmente para el mercado español y latinoamericano.
+Este proyecto forma parte de la microcredencial en IA Generativa de la USAL así como para posicionarme en la intersección entre **cumplimiento normativo ESG** y **herramientas de IA aplicadas** — especialmente para el mercado español y latinoamericano.
 
 - 🔗 LinkedIn: [linkedin.com/in/tu-perfil](https://www.linkedin.com/in/pablolopezvaca/)
 - 💻 GitHub: [github.com/tu-usuario](https://github.com/Pablolopezvaca)
